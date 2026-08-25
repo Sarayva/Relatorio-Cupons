@@ -661,6 +661,10 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
     const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
     const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
 
+    // Calcula margem de segurança de 15% para que o número do datalabel não seja cortado
+    const maxVal = Math.max(...data, 0);
+    const paddedMax = maxVal > 0 ? maxVal * 1.15 : undefined;
+
     chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
         type: 'bar',
         data: { labels: labels, datasets: [dataset] },
@@ -668,22 +672,31 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
             indexAxis: isHorizontal ? 'y' : 'x',
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    right: isHorizontal ? 25 : 0,
+                    top: !isHorizontal ? 15 : 0
+                }
+            },
             plugins: {
                 legend: { display: false },
                 datalabels: {
                     color: isHorizontal ? (isDarkTheme ? '#ffffff' : '#1a1a1a') : '#fff',
-                    anchor: isHorizontal ? 'end' : 'end',
+                    anchor: 'end',
                     align: isHorizontal ? 'end' : 'bottom',
-                    font: { weight: 'bold', size: 10 },
+                    offset: 4,
+                    font: { weight: 'bold', size: 11 },
                     ...labelOpt
                 }
             },
             scales: {
                 x: { 
+                    max: isHorizontal ? paddedMax : undefined,
                     grid: { color: isHorizontal ? gridColor : 'transparent' },
                     ticks: { color: textColor }
                 },
                 y: { 
+                    max: !isHorizontal ? paddedMax : undefined,
                     grid: { color: isHorizontal ? 'transparent' : gridColor },
                     ticks: { color: textColor }
                 }
