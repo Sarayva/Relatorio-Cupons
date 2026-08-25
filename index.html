@@ -1294,26 +1294,23 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
         function obterIdentificadorSemana(records) {
             if (!records || !records.length) return 'atual';
 
-            // 1. Verificar se existe alguma coluna explícita indicando a semana
-            for (let r of records) {
-                for (let key in r) {
-                    if (/semana/i.test(key) && r[key] !== null && r[key] !== undefined && String(r[key]).trim() !== '') {
-                        let val = String(r[key]).trim().replace(/^semana\s*/i, '');
-                        if (val) return val;
-                    }
-                }
-            }
-
-            // 2. Extrair data de venda e calcular o número da semana no ano
             let datasValidas = [];
             for (let r of records) {
                 if (r.DataVenda) {
-                    let strDate = String(r.DataVenda).split(' ')[0];
+                    let strDate = String(r.DataVenda).trim().split(' ')[0];
                     let parts = strDate.split('/');
                     if (parts.length === 3) {
                         let d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
                         if (!isNaN(d.getTime())) {
                             datasValidas.push(d);
+                        }
+                    } else {
+                        parts = strDate.split('-');
+                        if (parts.length === 3) {
+                            let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                            if (!isNaN(d.getTime())) {
+                                datasValidas.push(d);
+                            }
                         }
                     }
                 }
@@ -1321,17 +1318,22 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
 
             if (datasValidas.length > 0) {
                 datasValidas.sort((a, b) => a - b);
-                let firstDate = datasValidas[0];
-                let target = new Date(firstDate.valueOf());
-                let dayNr = (firstDate.getDay() + 6) % 7;
-                target.setDate(target.getDate() - dayNr + 3);
-                let firstThursday = target.valueOf();
-                target.setMonth(0, 1);
-                if (target.getDay() !== 4) {
-                    target.setMonth(0, 1 + ((4 - target.getDay() + 7) % 7));
+                let minDate = datasValidas[0];
+                let maxDate = datasValidas[datasValidas.length - 1];
+
+                const fmtDDMM = (d) => {
+                    let day = String(d.getDate()).padStart(2, '0');
+                    let month = String(d.getMonth() + 1).padStart(2, '0');
+                    return `${day}-${month}`;
+                };
+
+                let minStr = fmtDDMM(minDate);
+                let maxStr = fmtDDMM(maxDate);
+
+                if (minStr === maxStr) {
+                    return minStr;
                 }
-                let weekNo = 1 + Math.ceil((firstThursday - target) / 604800000);
-                return weekNo;
+                return `${minStr} a ${maxStr}`;
             }
 
             return 'atual';
@@ -1727,6 +1729,10 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `relatorio semana ${semanaId}.xlsx`;
+                link.click();
+                URL.revokeObjectURL(link.href);
                 link.href = URL.createObjectURL(blob);
                 link.download = `relatorio da semana ${semanaId}.xlsx`;
                 link.click();
