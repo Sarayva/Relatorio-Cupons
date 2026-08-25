@@ -342,6 +342,133 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* --- RESUMO EXECUTIVO EM TEXTO (FLUENT DESIGN) --- */
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--card-border);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .summary-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .summary-title-group h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .summary-badge {
+            background: rgba(0, 120, 212, 0.15);
+            color: var(--accent);
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 120, 212, 0.3);
+        }
+
+        .btn-copy-summary {
+            background: var(--accent-bg);
+            color: #ffffff;
+            border: none;
+            padding: 0.55rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-summary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 1.1rem;
+        }
+
+        .light-theme .summary-item {
+            background: #ffffff;
+        }
+
+        .summary-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-item-text {
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .summary-item-highlight {
+            font-weight: 700;
+            color: var(--color-red);
+        }
+
+        .summary-exec-box {
+            margin-top: 1.25rem;
+            background: rgba(216, 90, 48, 0.1);
+            border-left: 4px solid var(--color-leite);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+        }
+
+        .summary-exec-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .summary-exec-desc {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
         /* KPIs Windows 11 Card Style */
         .kpi-grid {
             display: grid;
@@ -512,6 +639,19 @@
                     </div>
                 </div>
                 <div class="kpi-card"><h3>Margem</h3><p id="kpi-margem" style="color:var(--color-green)">R$ 0</p></div>
+            <div id="summary-container" class="summary-card">
+                <div class="summary-header">
+                    <div class="summary-title-group">
+                        <h2>📝 Resumo Executivo Gerencial</h2>
+                        <span class="summary-badge">Pontos Principais do Relatório</span>
+                    </div>
+                    <button id="btn-copy-summary" class="btn-copy-summary" title="Copiar resumo formatado para área de transferência">
+                        <span>📋</span> Copiar Resumo
+                    </button>
+                </div>
+                <div id="summary-content">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Importe uma planilha para visualizar o resumo executivo automático dos dados.</p>
+                </div>
             </div>
 
             <div id="alert-container"></div>
@@ -943,7 +1083,123 @@ function calcularDashboard(records) {
     drawFinChart('chartFin', compactLabels, dsFin);
 
     GLOBAL_EXPORT_DATA = { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja };
+    
+    // Gerar Resumo Executivo em Texto na Tela
+    gerarResumoExecutivoTexto(records, GLOBAL_EXPORT_DATA);
 }
+
+function gerarResumoExecutivoTexto(records, exportData) {
+    const { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja } = exportData;
+    const totC = arrLojas.reduce((a, b) => a + b.q, 0);
+
+    if (!totC) return;
+
+    const topLoja = arrLojas[0] || { nome: 'N/A', q: 0 };
+    const pctTopLoja = ((topLoja.q / totC) * 100).toFixed(1);
+
+    const lojasConcentradas = arrLojas.filter(l => (l.q / totC) > 0.10);
+    const mediaCuponsLoja = arrLojas.length ? (totC / arrLojas.length) : 0;
+    const lojasAcimaMedia = arrLojas.filter(l => l.q > mediaCuponsLoja * 1.25);
+
+    const topVend = arrVend[0] || { nome: 'N/A', q: 0 };
+    const pctTopVend = ((topVend.q / totC) * 100).toFixed(1);
+    const mediaCuponsVend = arrVend.length ? (totC / arrVend.length) : 0;
+    const vendsAcimaMedia = arrVend.filter(v => v.q > mediaCuponsVend * 1.25);
+
+    const topLinha = arrLinha[0] || { nome: 'N/A', q: 0 };
+    const pctTopLinha = ((topLinha.q / totC) * 100).toFixed(1);
+
+    let diaCritico = { n: 'N/A', v: 0 };
+    diaData.forEach(d => {
+        if (d.v > diaCritico.v) diaCritico = d;
+    });
+
+    const totVendidoStr = document.getElementById('kpi-vendido').innerText;
+    const totDescStr = document.getElementById('kpi-desconto').innerText;
+    const pctDescStr = document.getElementById('kpi-pct-desc').innerText;
+
+    // Texto Formatado Completo (Ideal para E-mail / WhatsApp / Apresentações)
+    const textoFormatado = `*RESUMO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS*
+--------------------------------------------------
+📊 *VISÃO GERAL DO PERÍODO*:
+- Total de Cupons Emitidos: ${totC.toLocaleString('pt-BR')} cupons
+- Faturamento Vendido Bruto: ${totVendidoStr}
+- Total Concedido em Descontos: ${totDescStr} (${pctDescStr})
+
+🏬 *GARGALOS POR LOJA (Menos cupons = Melhor)*:
+- Loja líder em concessões: *${topLoja.nome}* com ${topLoja.q.toLocaleString('pt-BR')} cupons (${pctTopLoja}% do total da rede).
+- ${lojasConcentradas.length > 0 ? `Lojas concentrando mais de 10% da rede: ${lojasConcentradas.map(l => l.nome).join(', ')}.` : 'Nenhuma loja ultrapassou 10% isoladamente.'}
+- Lojas em nível de Alerta (acima da média): ${lojasAcimaMedia.length} de ${arrLojas.length} unidades.
+
+👤 *GARGALOS POR VENDEDOR*:
+- Vendedor líder de cupons: *${topVend.nome}* com ${topVend.q.toLocaleString('pt-BR')} cupons (${pctTopVend}% do total).
+- Vendedores em Alerta (acima da média): ${vendsAcimaMedia.length} vendedores.
+
+💊 *PRODUTOS & LINHAS IMPACTADAS*:
+- Linha mais afetada: *${topLinha.nome}* com ${topLinha.q.toLocaleString('pt-BR')} cupons (${pctTopLinha}% da rede).
+
+📅 *PICO SEMANAL*:
+- Dia com maior ocorrência média/dia: *${diaCritico.n}* (média de ${diaCritico.v.toFixed(1)} cupons/dia).
+
+💡 *DIRETRIZ & RECOMENDAÇÃO GERENCIAL*:
+Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar o histórico do vendedor *${topVend.nome}*, que lideram os indicadores de exceções manuais.`;
+
+    const container = document.getElementById('summary-content');
+    container.innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-item-header">📊 Visão Geral</div>
+                <div class="summary-item-text">
+                    Foram identificados <strong>${totC.toLocaleString('pt-BR')} cupons únicos</strong> na rede, gerando <strong>${totDescStr}</strong> em descontos (${pctDescStr}) sobre o faturamento bruto de <strong>${totVendidoStr}</strong>.
+                </div>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-item-header">🏬 Principal Gargalo por Loja</div>
+                <div class="summary-item-text">
+                    A unidade <strong class="summary-item-highlight">${topLoja.nome}</strong> lidera a emissão com <strong>${topLoja.q.toLocaleString('pt-BR')} cupons</strong> (${pctTopLoja}% da rede). Há <strong>${lojasAcimaMedia.length} lojas</strong> operando acima da média.
+                </div>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-item-header">👤 Principal Gargalo por Vendedor</div>
+                <div class="summary-item-text">
+                    O vendedor <strong class="summary-item-highlight">${topVend.nome}</strong> registrou o maior volume com <strong>${topVend.q.toLocaleString('pt-BR')} cupons</strong> (${pctTopVend}% do total). Há <strong>${vendsAcimaMedia.length} vendedores</strong> em alerta.
+                </div>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-item-header">💊 Linha & Dia Crítico</div>
+                <div class="summary-item-text">
+                    Linha mais afetada: <strong>${topLinha.nome}</strong> (${pctTopLinha}% dos cupons). O dia de maior incidência é <strong>${diaCritico.n}</strong> (média de ${diaCritico.v.toFixed(1)} cupons/dia).
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-exec-box">
+            <div class="summary-exec-title">🎯 Parecer Executivo & Recomendação</div>
+            <div class="summary-exec-desc">
+                Conforme a metodologia de gestão (menor emissão = melhor desempenho), recomenda-se direcionar a auditoria operacional prioritariamente na unidade <strong>${topLoja.nome}</strong> e revisar os limites de concessão do vendedor <strong>${topVend.nome}</strong>.
+            </div>
+        </div>
+    `;
+
+    window.SUMMARY_TEXT_RAW = textoFormatado;
+}
+
+document.getElementById('btn-copy-summary').addEventListener('click', () => {
+    if (!window.SUMMARY_TEXT_RAW) return;
+    navigator.clipboard.writeText(window.SUMMARY_TEXT_RAW).then(() => {
+        const btn = document.getElementById('btn-copy-summary');
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<span>✅</span> Copiado com Sucesso!';
+        btn.style.background = 'var(--color-green)';
+        setTimeout(() => {
+            btn.innerHTML = origText;
+            btn.style.background = '';
+        }, 2500);
+    });
+});
 
 async function exportarExcelProfissional() {
     if (!GLOBAL_RECORDS.length) return;
