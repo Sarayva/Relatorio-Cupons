@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Cupons - FarmaPaulo</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" href="imagens/favicon.png" type="image/png">
-    
+
     <!-- Google Fonts: Segoe UI style / Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Bibliotecas Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
@@ -72,8 +74,13 @@
             --color-red: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -82,12 +89,19 @@
             transition: background-color 0.25s ease, color 0.25s ease;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
 
         /* --- HERO / LANDING UPLOAD SCREEN --- */
         #hero-screen {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: var(--bg-color);
             display: flex;
             flex-direction: column;
@@ -104,13 +118,16 @@
         #hero-screen::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(0, 120, 212, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(0, 120, 212, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
             pointer-events: none;
         }
 
         body.light-theme #hero-screen::before {
-            background: radial-gradient(circle at 50% 30%, rgba(0, 120, 212, 0.08) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle at 50% 30%, rgba(0, 120, 212, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
         }
 
         /* Alternador de tema fixo na Hero */
@@ -173,7 +190,8 @@
             color: #ffffff;
             background: var(--accent-bg);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px; /* Estilo Win 11 */
+            border-radius: 6px;
+            /* Estilo Win 11 */
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -348,7 +366,11 @@
             margin: 0 auto 1.5rem;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* --- RESUMO EXECUTIVO EM TEXTO (FLUENT DESIGN) --- */
         .summary-card {
@@ -522,9 +544,19 @@
             margin-left: auto;
         }
 
-        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .flex-between {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        #alert-container { margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        #alert-container {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
         .alert {
             background: rgba(239, 68, 68, 0.12);
             border-left: 4px solid var(--color-red);
@@ -535,7 +567,10 @@
             align-items: center;
             color: var(--text-main);
         }
-        .alert strong { color: var(--color-red); }
+
+        .alert strong {
+            color: var(--color-red);
+        }
 
         .charts-grid {
             display: grid;
@@ -543,7 +578,11 @@
             gap: 1.5rem;
         }
 
-        @media (max-width: 950px) { .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 950px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
         .chart-card {
             background: var(--card-bg);
@@ -560,11 +599,18 @@
             color: var(--text-main);
         }
 
-        .canvas-wrapper { position: relative; height: 350px; width: 100%; }
+        .canvas-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body>
 
     <input type="file" id="file-input" accept=".xls,.xlsx" class="hidden">
@@ -581,7 +627,7 @@
         <div class="hero-content">
             <!-- LOGO EXPANDIDA (PADRÃO ESCURO = LOGO BRANCA) -->
             <img id="hero-logo-img" src="imagens/para fundo claro.png" alt="FarmaPaulo Logo" class="hero-logo">
-            
+
             <h1 class="hero-title">
                 <span>Dados que revelam.</span>
                 <span>Análises que direcionam.</span>
@@ -590,18 +636,19 @@
 
             <label class="btn-hero-import" for="file-input">
                 <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 Importar Arquivo
             </label>
 
-            <p class="hero-drop-hint">Ou arraste e solte a planilha <strong>inicio.xls</strong> aqui</p>
+            <p class="hero-drop-hint">Ou arraste e solte a planilha aqui</p>
         </div>
     </div>
 
     <!-- DASHBOARD CONTAINER -->
     <div class="container">
-        
+
         <header id="dash-header" class="hidden">
             <div class="header-brand">
                 <img id="dash-logo" src="imagens/para fundo claro.png" alt="FarmaPaulo Logo" class="dash-logo">
@@ -610,7 +657,7 @@
                     <p>Relatório Analítico FarmaPaulo</p>
                 </div>
             </div>
-            
+
             <div class="header-actions">
                 <button class="theme-toggle btn-toggle-trigger" title="Alternar Modo Claro / Escuro">
                     <span class="theme-btn-icon">☀️</span>
@@ -618,12 +665,19 @@
                 </button>
 
                 <label for="file-input" class="btn-action btn-secondary">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
                     Nova Planilha
                 </label>
-                
+
                 <button id="btn-export" class="btn-action" disabled>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
                     Exportar Excel
                 </button>
             </div>
@@ -636,9 +690,18 @@
 
         <main id="dashboard" class="hidden">
             <div class="kpi-grid">
-                <div class="kpi-card"><h3>Cupons Únicos</h3><p id="kpi-cupons">0</p></div>
-                <div class="kpi-card"><h3>Lojas / Vendedores</h3><p id="kpi-lojas-vend">0 / 0</p></div>
-                <div class="kpi-card"><h3>Total Vendido</h3><p id="kpi-vendido">R$ 0</p></div>
+                <div class="kpi-card">
+                    <h3>Cupons Únicos</h3>
+                    <p id="kpi-cupons">0</p>
+                </div>
+                <div class="kpi-card">
+                    <h3>Lojas / Vendedores</h3>
+                    <p id="kpi-lojas-vend">0 / 0</p>
+                </div>
+                <div class="kpi-card">
+                    <h3>Total Vendido</h3>
+                    <p id="kpi-vendido">R$ 0</p>
+                </div>
                 <div class="kpi-card">
                     <h3>Total Desconto</h3>
                     <div class="flex-between">
@@ -646,7 +709,10 @@
                         <span id="kpi-pct-desc" style="color:var(--color-red)">0%</span>
                     </div>
                 </div>
-                <div class="kpi-card"><h3>Margem</h3><p id="kpi-margem" style="color:var(--color-green)">R$ 0</p></div>
+                <div class="kpi-card">
+                    <h3>Margem</h3>
+                    <p id="kpi-margem" style="color:var(--color-green)">R$ 0</p>
+                </div>
             </div>
 
             <div id="summary-container" class="summary-card">
@@ -655,12 +721,14 @@
                         <h2>📝 Resumo Executivo Gerencial</h2>
                         <span class="summary-badge">Pontos Principais do Relatório</span>
                     </div>
-                    <button id="btn-copy-summary" class="btn-copy-summary" title="Copiar resumo formatado para área de transferência">
+                    <button id="btn-copy-summary" class="btn-copy-summary"
+                        title="Copiar resumo formatado para área de transferência">
                         <span>📋</span> Copiar Resumo
                     </button>
                 </div>
                 <div id="summary-content">
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Importe uma planilha para visualizar o resumo executivo automático dos dados.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Importe uma planilha para visualizar o
+                        resumo executivo automático dos dados.</p>
                 </div>
             </div>
 
@@ -695,453 +763,453 @@
         </main>
     </div>
 
-<script>
-// --- Controle de Tema (Claro / Escuro - Win 11 Style) ---
-let isDarkTheme = true;
+    <script>
+        // --- Controle de Tema (Claro / Escuro - Win 11 Style) ---
+        let isDarkTheme = true;
 
-const heroLogo = document.getElementById('hero-logo-img');
-const dashLogo = document.getElementById('dash-logo');
-const toggleButtons = document.querySelectorAll('.btn-toggle-trigger');
+        const heroLogo = document.getElementById('hero-logo-img');
+        const dashLogo = document.getElementById('dash-logo');
+        const toggleButtons = document.querySelectorAll('.btn-toggle-trigger');
 
-toggleButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        isDarkTheme = !isDarkTheme;
-        
-        if (isDarkTheme) {
-            document.body.classList.remove('light-theme');
-            heroLogo.src = 'imagens/para fundo claro.png';
-            dashLogo.src = 'imagens/para fundo claro.png';
-            toggleButtons.forEach(b => {
-                b.querySelector('.theme-btn-icon').innerText = '☀️';
-                b.querySelector('.theme-btn-label').innerText = 'Modo Claro';
-            });
-        } else {
-            document.body.classList.add('light-theme');
-            heroLogo.src = 'imagens/para fundo branco.png';
-            dashLogo.src = 'imagens/para fundo branco.png';
-            toggleButtons.forEach(b => {
-                b.querySelector('.theme-btn-icon').innerText = '🌙';
-                b.querySelector('.theme-btn-label').innerText = 'Modo Escuro';
-            });
-        }
-        
-        if (GLOBAL_RECORDS.length > 0) {
-            calcularDashboard(GLOBAL_RECORDS);
-        }
-    });
-});
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                isDarkTheme = !isDarkTheme;
 
-// --- Retornar para a Tela Principal ao Clicar na Logo/Brand ---
-const headerBrand = document.querySelector('.header-brand');
-if (headerBrand) {
-    headerBrand.addEventListener('click', () => {
-        document.getElementById('dash-header').classList.add('hidden');
-        document.getElementById('dashboard').classList.add('hidden');
-        document.getElementById('hero-screen').classList.remove('hidden');
-        document.getElementById('file-input').value = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-}
-
-const STORE_MAP = {
-  2:"002 - CERRO AZUL", 3:"003 - BORBA GATO", 4:"004 - OPERÁRIA",
-  6:"006 - 24HORAS", 7:"007 - PEDRO TAQUES", 8:"008 - SARANDI",
-  9:"009 - PRAÇA", 10:"010 - TEIXEIRA MENDES", 11:"011 - MANDACARU",
-  12:"012 - FARROUPILHA", 13:"013 - H.U.", 14:"014 - MORANGUEIRA",
-  15:"015 - GETULIO VARGAS", 16:"016 - PIÇANDU 1", 17:"017 - TUIUTI",
-  18:"018 - SOUZA NAVES", 19:"019 - PALMARES", 20:"020 - DUBAI",
-  28:"028 - NEY BRAGA", 31:"031 - SARANDI 2", 32:"032 - CIDADE ALTA",
-  33:"033 - KAKOGAWA", 35:"035 - MUFFATO", 36:"036 - SARANDI 3 DRIVE",
-  37:"037 - SARANDI 4 UPA", 38:"038 - BOM JARDIM", 39:"039 - MARIALVA",
-  40:"040 - PARANÁ", 41:"041 - GASTAO VIDIGAL", 42:"042 - MANDAGUARI",
-  43:"043 - TERRA BOA", 44:"044 - SARANDI 5 MARANGONI",
-  45:"045 - CAMPO MOURÃO", 46:"046 - MARIALVA 2 HAMADA",
-  47:"047 - PIÇANDU 2 CANCAO", 48:"048 - TAPEJARA",
-  49:"049 - JANDAIA DO SUL", 50:"050 - SOMACO",
-  51:"051 - FIM DA PICADA", 52:"052 - MUFFATO 2 JOÃO PAULINO",
-  53:"053 - PORTO RICO", 54:"054 - ITAIPU", 55:"055 - LOANDA",
-  56:"056 - PARANAVAÍ", 57:"057 - BOLA DE NEVE",
-  59:"059 - NILO RIBEIRO", 60:"060 - AV SÃO PAULO"
-};
-
-const CORES_LINHA = {
-  "RX":             "#378ADD",
-  "GENERICO":       "#1D9E75",
-  "LEITE INFANTIL": "#D85A30",
-  "VITAMINAS":      "#BA7517",
-  "SIMILAR":        "#7F77DD",
-  "FRALDA":         "#D4537E",
-  "OTC":            "#639922",
-  "VACINAS":        "#E24B4A",
-  "OUTROS":         "#888780"
-};
-
-function classificaLinha(cat) {
-  const c = String(cat).toUpperCase();
-  if (c.includes('LEITE'))                        return 'LEITE INFANTIL';
-  if (c.includes('FRALDA'))                       return 'FRALDA';
-  if (c.includes('VITAMIN'))                      return 'VITAMINAS';
-  if (c.includes('VACINA'))                       return 'VACINAS';
-  if (c.includes('GENERIC') || c.includes('GENÉRIC')) return 'GENERICO';
-  if (/RX/.test(c) || c.includes('ETICO') || c.includes('ÉTICO')) return 'RX';
-  if (c.includes('SIMILAR'))                      return 'SIMILAR';
-  if (/OTC/.test(c))                         return 'OTC';
-  return 'OUTROS';
-}
-
-function resolveColorSemaforo(val) {
-    if (val >= 10) return getComputedStyle(document.body).getPropertyValue('--color-red').trim();
-    if (val >= 5) return getComputedStyle(document.body).getPropertyValue('--color-yellow').trim();
-    return getComputedStyle(document.body).getPropertyValue('--color-green').trim();
-}
-
-function parseStrToNum(val) {
-    if (typeof val === 'number') return val;
-    if (!val) return 0;
-    let s = String(val).replace(/R\$/g, '').trim(); 
-    return parseFloat(s) || 0;
-}
-
-const fmtBL = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-let GLOBAL_RECORDS = [];
-let GLOBAL_EXPORT_DATA = {};
-let chartsObj = {};
-
-Chart.register(ChartDataLabels);
-Chart.defaults.font.family = "'Inter', sans-serif";
-
-function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt = {}) {
-    if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
-    
-    let dataset = {
-        data: data,
-        backgroundColor: colors,
-        borderWidth: 0,
-        borderRadius: 4
-    };
-
-    const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
-    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
-
-    // Calcula margem de segurança de 15% para que o número do datalabel não seja cortado
-    const maxVal = Math.max(...data, 0);
-    const paddedMax = maxVal > 0 ? maxVal * 1.15 : undefined;
-
-    chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
-        type: 'bar',
-        data: { labels: labels, datasets: [dataset] },
-        options: {
-            indexAxis: isHorizontal ? 'y' : 'x',
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    right: isHorizontal ? 25 : 0,
-                    top: !isHorizontal ? 15 : 0
+                if (isDarkTheme) {
+                    document.body.classList.remove('light-theme');
+                    heroLogo.src = 'imagens/para fundo claro.png';
+                    dashLogo.src = 'imagens/para fundo claro.png';
+                    toggleButtons.forEach(b => {
+                        b.querySelector('.theme-btn-icon').innerText = '☀️';
+                        b.querySelector('.theme-btn-label').innerText = 'Modo Claro';
+                    });
+                } else {
+                    document.body.classList.add('light-theme');
+                    heroLogo.src = 'imagens/para fundo branco.png';
+                    dashLogo.src = 'imagens/para fundo branco.png';
+                    toggleButtons.forEach(b => {
+                        b.querySelector('.theme-btn-icon').innerText = '🌙';
+                        b.querySelector('.theme-btn-label').innerText = 'Modo Escuro';
+                    });
                 }
-            },
-            plugins: {
-                legend: { display: false },
-                datalabels: {
-                    color: isHorizontal ? (isDarkTheme ? '#ffffff' : '#1a1a1a') : '#fff',
-                    anchor: 'end',
-                    align: isHorizontal ? 'end' : 'bottom',
-                    offset: 4,
-                    font: { weight: 'bold', size: 11 },
-                    ...labelOpt
+
+                if (GLOBAL_RECORDS.length > 0) {
+                    calcularDashboard(GLOBAL_RECORDS);
                 }
-            },
-            scales: {
-                x: { 
-                    max: isHorizontal ? paddedMax : undefined,
-                    grid: { color: isHorizontal ? gridColor : 'transparent' },
-                    ticks: { color: textColor }
-                },
-                y: { 
-                    max: !isHorizontal ? paddedMax : undefined,
-                    grid: { color: isHorizontal ? 'transparent' : gridColor },
-                    ticks: { color: textColor }
-                }
-            }
-        }
-    });
-}
-
-function drawFinChart(ctxId, labels, dsInfo) {
-    if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
-    
-    const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
-    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
-
-    chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: dsInfo
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, color: textColor } },
-                datalabels: { display: false }
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { color: textColor } },
-                y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => `R$${v/1000}k` } }
-            }
-        }
-    });
-}
-
-document.getElementById('file-input').addEventListener('change', e => {
-    if(e.target.files.length) processFile(e.target.files[0]);
-});
-
-const heroScreen = document.getElementById('hero-screen');
-
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    window.addEventListener(eventName, e => e.preventDefault());
-});
-
-['dragenter', 'dragover'].forEach(eventName => {
-    heroScreen.addEventListener(eventName, () => heroScreen.classList.add('dragover'));
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-    heroScreen.addEventListener(eventName, () => heroScreen.classList.remove('dragover'));
-});
-
-window.addEventListener('drop', e => {
-    e.preventDefault();
-    if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
-});
-
-function processFile(file) {
-    heroScreen.style.display = 'none';
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('dash-header').classList.add('hidden');
-    document.getElementById('loader').style.display = 'block';
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
-            
-            let headerIdx = raw.findIndex(r => r.length > 5 && r.includes('CodFilial'));
-            if(headerIdx === -1) headerIdx = 2;
-            
-            const headers = raw[headerIdx];
-            const rows = raw.slice(headerIdx + 1).filter(r => r.some(v => v !== null));
-
-            let records = rows.map(r => {
-                let obj = {};
-                headers.forEach((h, i) => { if(h) obj[h] = r[i] ?? null; });
-                return obj;
             });
+        });
 
-            const ffillCols = ['CodFilial','TipoDesconto','NrCupom','NmVendedor','DataVenda'];
-            ffillCols.forEach(col => {
-                let last = null;
-                records.forEach(r => {
-                    if (r[col] !== null && r[col] !== undefined && r[col] !== '') {
-                        last = r[col];
-                    } else {
-                        r[col] = last;
+        // --- Retornar para a Tela Principal ao Clicar na Logo/Brand ---
+        const headerBrand = document.querySelector('.header-brand');
+        if (headerBrand) {
+            headerBrand.addEventListener('click', () => {
+                document.getElementById('dash-header').classList.add('hidden');
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('hero-screen').classList.remove('hidden');
+                document.getElementById('file-input').value = '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        const STORE_MAP = {
+            2: "002 - CERRO AZUL", 3: "003 - BORBA GATO", 4: "004 - OPERÁRIA",
+            6: "006 - 24HORAS", 7: "007 - PEDRO TAQUES", 8: "008 - SARANDI",
+            9: "009 - PRAÇA", 10: "010 - TEIXEIRA MENDES", 11: "011 - MANDACARU",
+            12: "012 - FARROUPILHA", 13: "013 - H.U.", 14: "014 - MORANGUEIRA",
+            15: "015 - GETULIO VARGAS", 16: "016 - PIÇANDU 1", 17: "017 - TUIUTI",
+            18: "018 - SOUZA NAVES", 19: "019 - PALMARES", 20: "020 - DUBAI",
+            28: "028 - NEY BRAGA", 31: "031 - SARANDI 2", 32: "032 - CIDADE ALTA",
+            33: "033 - KAKOGAWA", 35: "035 - MUFFATO", 36: "036 - SARANDI 3 DRIVE",
+            37: "037 - SARANDI 4 UPA", 38: "038 - BOM JARDIM", 39: "039 - MARIALVA",
+            40: "040 - PARANÁ", 41: "041 - GASTAO VIDIGAL", 42: "042 - MANDAGUARI",
+            43: "043 - TERRA BOA", 44: "044 - SARANDI 5 MARANGONI",
+            45: "045 - CAMPO MOURÃO", 46: "046 - MARIALVA 2 HAMADA",
+            47: "047 - PIÇANDU 2 CANCAO", 48: "048 - TAPEJARA",
+            49: "049 - JANDAIA DO SUL", 50: "050 - SOMACO",
+            51: "051 - FIM DA PICADA", 52: "052 - MUFFATO 2 JOÃO PAULINO",
+            53: "053 - PORTO RICO", 54: "054 - ITAIPU", 55: "055 - LOANDA",
+            56: "056 - PARANAVAÍ", 57: "057 - BOLA DE NEVE",
+            59: "059 - NILO RIBEIRO", 60: "060 - AV SÃO PAULO"
+        };
+
+        const CORES_LINHA = {
+            "RX": "#378ADD",
+            "GENERICO": "#1D9E75",
+            "LEITE INFANTIL": "#D85A30",
+            "VITAMINAS": "#BA7517",
+            "SIMILAR": "#7F77DD",
+            "FRALDA": "#D4537E",
+            "OTC": "#639922",
+            "VACINAS": "#E24B4A",
+            "OUTROS": "#888780"
+        };
+
+        function classificaLinha(cat) {
+            const c = String(cat).toUpperCase();
+            if (c.includes('LEITE')) return 'LEITE INFANTIL';
+            if (c.includes('FRALDA')) return 'FRALDA';
+            if (c.includes('VITAMIN')) return 'VITAMINAS';
+            if (c.includes('VACINA')) return 'VACINAS';
+            if (c.includes('GENERIC') || c.includes('GENÉRIC')) return 'GENERICO';
+            if (/RX/.test(c) || c.includes('ETICO') || c.includes('ÉTICO')) return 'RX';
+            if (c.includes('SIMILAR')) return 'SIMILAR';
+            if (/OTC/.test(c)) return 'OTC';
+            return 'OUTROS';
+        }
+
+        function resolveColorSemaforo(val) {
+            if (val >= 10) return getComputedStyle(document.body).getPropertyValue('--color-red').trim();
+            if (val >= 5) return getComputedStyle(document.body).getPropertyValue('--color-yellow').trim();
+            return getComputedStyle(document.body).getPropertyValue('--color-green').trim();
+        }
+
+        function parseStrToNum(val) {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            let s = String(val).replace(/R\$/g, '').trim();
+            return parseFloat(s) || 0;
+        }
+
+        const fmtBL = Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        let GLOBAL_RECORDS = [];
+        let GLOBAL_EXPORT_DATA = {};
+        let chartsObj = {};
+
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt = {}) {
+            if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
+
+            let dataset = {
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 0,
+                borderRadius: 4
+            };
+
+            const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
+            const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+
+            // Calcula margem de segurança de 15% para que o número do datalabel não seja cortado
+            const maxVal = Math.max(...data, 0);
+            const paddedMax = maxVal > 0 ? maxVal * 1.15 : undefined;
+
+            chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
+                type: 'bar',
+                data: { labels: labels, datasets: [dataset] },
+                options: {
+                    indexAxis: isHorizontal ? 'y' : 'x',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            right: isHorizontal ? 25 : 0,
+                            top: !isHorizontal ? 15 : 0
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: isHorizontal ? (isDarkTheme ? '#ffffff' : '#1a1a1a') : '#fff',
+                            anchor: 'end',
+                            align: isHorizontal ? 'end' : 'bottom',
+                            offset: 4,
+                            font: { weight: 'bold', size: 11 },
+                            ...labelOpt
+                        }
+                    },
+                    scales: {
+                        x: {
+                            max: isHorizontal ? paddedMax : undefined,
+                            grid: { color: isHorizontal ? gridColor : 'transparent' },
+                            ticks: { color: textColor }
+                        },
+                        y: {
+                            max: !isHorizontal ? paddedMax : undefined,
+                            grid: { color: isHorizontal ? 'transparent' : gridColor },
+                            ticks: { color: textColor }
+                        }
                     }
-                });
+                }
+            });
+        }
+
+        function drawFinChart(ctxId, labels, dsInfo) {
+            if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
+
+            const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
+            const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+
+            chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: dsInfo
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12, color: textColor } },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => `R$${v / 1000}k` } }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('file-input').addEventListener('change', e => {
+            if (e.target.files.length) processFile(e.target.files[0]);
+        });
+
+        const heroScreen = document.getElementById('hero-screen');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            window.addEventListener(eventName, e => e.preventDefault());
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            heroScreen.addEventListener(eventName, () => heroScreen.classList.add('dragover'));
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            heroScreen.addEventListener(eventName, () => heroScreen.classList.remove('dragover'));
+        });
+
+        window.addEventListener('drop', e => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+        });
+
+        function processFile(file) {
+            heroScreen.style.display = 'none';
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('dash-header').classList.add('hidden');
+            document.getElementById('loader').style.display = 'block';
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+                    let headerIdx = raw.findIndex(r => r.length > 5 && r.includes('CodFilial'));
+                    if (headerIdx === -1) headerIdx = 2;
+
+                    const headers = raw[headerIdx];
+                    const rows = raw.slice(headerIdx + 1).filter(r => r.some(v => v !== null));
+
+                    let records = rows.map(r => {
+                        let obj = {};
+                        headers.forEach((h, i) => { if (h) obj[h] = r[i] ?? null; });
+                        return obj;
+                    });
+
+                    const ffillCols = ['CodFilial', 'TipoDesconto', 'NrCupom', 'NmVendedor', 'DataVenda'];
+                    ffillCols.forEach(col => {
+                        let last = null;
+                        records.forEach(r => {
+                            if (r[col] !== null && r[col] !== undefined && r[col] !== '') {
+                                last = r[col];
+                            } else {
+                                r[col] = last;
+                            }
+                        });
+                    });
+
+                    GLOBAL_RECORDS = records;
+                    calcularDashboard(records);
+
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('dash-header').classList.remove('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    document.getElementById('btn-export').disabled = false;
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Erro ao ler o arquivo. Tem certeza que é do sistema de cupons?");
+                    document.getElementById('loader').style.display = 'none';
+                    heroScreen.style.display = 'flex';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function getDia(dataStr) {
+            if (!dataStr) return null;
+            let parts = (dataStr + "").split(" ")[0].split('/');
+            if (parts.length === 3) {
+                let d = new Date(parts[2], parts[1] - 1, parts[0]);
+                const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+                return dias[d.getDay()];
+            }
+            return null;
+        }
+
+        function calcularDashboard(records) {
+            const pLoja = {}, pVend = {}, pCat = {}, pLinha = {}, pDia = {};
+            const datasDiaUnico = {};
+            const financeiroLoja = {};
+
+            let gCupons = new Set(), gLojas = new Set(), gVend = new Set(), gCats = new Set();
+            let sumVendido = 0, sumDesc = 0, sumMargem = 0, sumPctDesc = 0, countPct = 0;
+
+            records.forEach(r => {
+                let nr = r.NrCupom;
+                if (!nr) return;
+
+                gCupons.add(nr);
+                let codF = parseInt(r.CodFilial);
+                let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${codF || r.CodFilial}`;
+                let vend = r.NmVendedor || 'N/A';
+                let cat = r.Categoria || 'N/A';
+                let linha = classificaLinha(cat);
+                let dia = getDia(r.DataVenda);
+                let fData = (r.DataVenda + "").split(" ")[0];
+
+                gLojas.add(loja); gVend.add(vend); gCats.add(cat);
+
+                if (!pLoja[loja]) pLoja[loja] = new Set(); pLoja[loja].add(nr);
+                if (!pVend[vend]) pVend[vend] = new Set(); pVend[vend].add(nr);
+                if (!pCat[cat]) pCat[cat] = new Set(); pCat[cat].add(nr);
+                if (!pLinha[linha]) pLinha[linha] = new Set(); pLinha[linha].add(nr);
+
+                if (dia) {
+                    if (!pDia[dia]) pDia[dia] = new Set();
+                    pDia[dia].add(nr);
+                    if (!datasDiaUnico[dia]) datasDiaUnico[dia] = new Set();
+                    datasDiaUnico[dia].add(fData);
+                }
+
+                let vVenda = parseStrToNum(r.VlrVenda);
+                let vDesc = parseStrToNum(r.VlrDescItens);
+                let vMargem = parseStrToNum(r.VlrMargemBruta);
+                let vPct = parseStrToNum(r['%DescontoFinal']);
+
+                if (!financeiroLoja[loja]) financeiroLoja[loja] = { v: 0, d: 0, m: 0 };
+                financeiroLoja[loja].v += vVenda;
+                financeiroLoja[loja].d += vDesc;
+                financeiroLoja[loja].m += vMargem;
+
+                sumVendido += vVenda;
+                sumDesc += vDesc;
+                sumMargem += vMargem;
+
+                if (vPct > 0 || r['%DescontoFinal'] != undefined) {
+                    sumPctDesc += vPct;
+                    countPct++;
+                }
             });
 
-            GLOBAL_RECORDS = records;
-            calcularDashboard(records);
+            const totC = gCupons.size;
+            const mediaPct = countPct ? (sumPctDesc / countPct) : 0;
 
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('dash-header').classList.remove('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('btn-export').disabled = false;
+            document.getElementById('kpi-cupons').innerText = totC;
+            document.getElementById('kpi-lojas-vend').innerText = `${gLojas.size} / ${gVend.size}`;
+            document.getElementById('kpi-vendido').innerText = fmtBL.format(sumVendido);
+            document.getElementById('kpi-desconto').innerText = fmtBL.format(sumDesc);
+            document.getElementById('kpi-margem').innerText = fmtBL.format(sumMargem);
+            document.getElementById('kpi-pct-desc').innerText = `${mediaPct.toFixed(1)}% Médio`;
 
-        } catch (error) {
-            console.error(error);
-            alert("Erro ao ler o arquivo. Tem certeza que é do sistema de cupons?");
-            document.getElementById('loader').style.display = 'none';
-            heroScreen.style.display = 'flex';
+            const sortArr = (obj) => Object.entries(obj).map(([k, v]) => ({ nome: k, q: v.size })).sort((a, b) => b.q - a.q);
+
+            const arrLojas = sortArr(pLoja);
+            const arrVend = sortArr(pVend);
+            const arrCats = sortArr(pCat);
+
+            const alertBox = document.getElementById('alert-container');
+            alertBox.innerHTML = '';
+            const concentradas = arrLojas.filter(l => (l.q / totC) > 0.10);
+            concentradas.forEach(l => {
+                let pct = ((l.q / totC) * 100).toFixed(1);
+                alertBox.innerHTML += `<div class="alert"><strong>Loja ${l.nome}</strong> está concentrando ${pct}% (${l.q}) de todos os cupons da rede!</div>`;
+            });
+
+            const topLojas = arrLojas.slice(0, 15);
+            drawBarChart('chartLojas', topLojas.map(t => t.nome), topLojas.map(t => t.q), topLojas.map(t => resolveColorSemaforo(t.q)));
+
+            const topVends = arrVend.slice(0, 10);
+            drawBarChart('chartVend', topVends.map(t => t.nome), topVends.map(t => t.q), topVends.map(t => resolveColorSemaforo(t.q)));
+
+            const topCats = arrCats.slice(0, 12);
+            drawBarChart('chartCat',
+                topCats.map(t => t.nome.substring(0, 20)), topCats.map(t => t.q), topCats.map(t => '#0078d4'),
+                true, { color: isDarkTheme ? '#ffffff' : '#1a1a1a' }
+            );
+
+            let arrLinha = sortArr(pLinha);
+            drawBarChart('chartLinhas',
+                arrLinha.map(t => t.nome),
+                arrLinha.map(t => t.q),
+                arrLinha.map(t => CORES_LINHA[t.nome] || CORES_LINHA["OUTROS"])
+            );
+
+            const orderDias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+            let diaData = orderDias.map(d => {
+                if (!pDia[d]) return { n: d, v: 0 };
+                return { n: d, v: (pDia[d].size / (datasDiaUnico[d].size || 1)) };
+            }).filter(d => d.v > 0);
+
+            let maxDia = Math.max(...diaData.map(d => d.v));
+            drawBarChart('chartDias', diaData.map(d => d.n), diaData.map(d => parseFloat(d.v.toFixed(1))),
+                diaData.map(d => d.v === maxDia ? '#ff6b6b' : '#0078d4'), false, { color: '#fff', align: 'start' }
+            );
+
+            let top8LojasNomes = arrLojas.slice(0, 8).map(l => l.nome);
+            let dsFin = [
+                { label: 'Vendido Bruto (R$)', backgroundColor: '#378ADD', data: top8LojasNomes.map(n => financeiroLoja[n].v) },
+                { label: 'Margem (R$)', backgroundColor: '#1D9E75', data: top8LojasNomes.map(n => financeiroLoja[n].m) },
+                { label: 'Desconto (R$)', backgroundColor: '#D85A30', data: top8LojasNomes.map(n => financeiroLoja[n].d) }
+            ];
+            let compactLabels = top8LojasNomes.map(l => l.includes('-') ? l.split('-')[1].substring(0, 10) : l.substring(0, 10));
+            drawFinChart('chartFin', compactLabels, dsFin);
+
+            GLOBAL_EXPORT_DATA = { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja };
+
+            // Gerar Resumo Executivo em Texto na Tela
+            gerarResumoExecutivoTexto(records, GLOBAL_EXPORT_DATA);
         }
-    };
-    reader.readAsArrayBuffer(file);
-}
 
-function getDia(dataStr) {
-    if(!dataStr) return null;
-    let parts = (dataStr+"").split(" ")[0].split('/');
-    if (parts.length === 3) {
-        let d = new Date(parts[2], parts[1]-1, parts[0]);
-        const dias = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
-        return dias[d.getDay()];
-    }
-    return null;
-}
+        function gerarResumoExecutivoTexto(records, exportData) {
+            const { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja } = exportData;
+            const totC = arrLojas.reduce((a, b) => a + b.q, 0);
 
-function calcularDashboard(records) {
-    const pLoja = {}, pVend = {}, pCat = {}, pLinha = {}, pDia = {};
-    const datasDiaUnico = {};
-    const financeiroLoja = {};
+            if (!totC) return;
 
-    let gCupons = new Set(), gLojas = new Set(), gVend = new Set(), gCats = new Set();
-    let sumVendido = 0, sumDesc = 0, sumMargem = 0, sumPctDesc = 0, countPct = 0;
+            const topLoja = arrLojas[0] || { nome: 'N/A', q: 0 };
+            const pctTopLoja = ((topLoja.q / totC) * 100).toFixed(1);
 
-    records.forEach(r => {
-        let nr = r.NrCupom;
-        if (!nr) return;
+            const lojasConcentradas = arrLojas.filter(l => (l.q / totC) > 0.10);
+            const mediaCuponsLoja = arrLojas.length ? (totC / arrLojas.length) : 0;
+            const lojasAcimaMedia = arrLojas.filter(l => l.q > mediaCuponsLoja * 1.25);
 
-        gCupons.add(nr);
-        let codF = parseInt(r.CodFilial);
-        let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${codF || r.CodFilial}`;
-        let vend = r.NmVendedor || 'N/A';
-        let cat = r.Categoria || 'N/A';
-        let linha = classificaLinha(cat);
-        let dia = getDia(r.DataVenda);
-        let fData = (r.DataVenda+"").split(" ")[0];
+            const topVend = arrVend[0] || { nome: 'N/A', q: 0 };
+            const pctTopVend = ((topVend.q / totC) * 100).toFixed(1);
+            const mediaCuponsVend = arrVend.length ? (totC / arrVend.length) : 0;
+            const vendsAcimaMedia = arrVend.filter(v => v.q > mediaCuponsVend * 1.25);
 
-        gLojas.add(loja); gVend.add(vend); gCats.add(cat);
+            const topLinha = arrLinha[0] || { nome: 'N/A', q: 0 };
+            const pctTopLinha = ((topLinha.q / totC) * 100).toFixed(1);
 
-        if(!pLoja[loja]) pLoja[loja] = new Set(); pLoja[loja].add(nr);
-        if(!pVend[vend]) pVend[vend] = new Set(); pVend[vend].add(nr);
-        if(!pCat[cat]) pCat[cat] = new Set(); pCat[cat].add(nr);
-        if(!pLinha[linha]) pLinha[linha] = new Set(); pLinha[linha].add(nr);
-        
-        if(dia) {
-            if(!pDia[dia]) pDia[dia] = new Set();
-            pDia[dia].add(nr);
-            if(!datasDiaUnico[dia]) datasDiaUnico[dia] = new Set();
-            datasDiaUnico[dia].add(fData);
-        }
+            let diaCritico = { n: 'N/A', v: 0 };
+            diaData.forEach(d => {
+                if (d.v > diaCritico.v) diaCritico = d;
+            });
 
-        let vVenda = parseStrToNum(r.VlrVenda);
-        let vDesc = parseStrToNum(r.VlrDescItens);
-        let vMargem = parseStrToNum(r.VlrMargemBruta);
-        let vPct = parseStrToNum(r['%DescontoFinal']);
+            const totVendidoStr = document.getElementById('kpi-vendido').innerText;
+            const totDescStr = document.getElementById('kpi-desconto').innerText;
+            const pctDescStr = document.getElementById('kpi-pct-desc').innerText;
 
-        if(!financeiroLoja[loja]) financeiroLoja[loja] = { v:0, d:0, m:0 };
-        financeiroLoja[loja].v += vVenda;
-        financeiroLoja[loja].d += vDesc;
-        financeiroLoja[loja].m += vMargem;
-
-        sumVendido += vVenda;
-        sumDesc += vDesc;
-        sumMargem += vMargem;
-        
-        if(vPct > 0 || r['%DescontoFinal']!=undefined) {
-            sumPctDesc += vPct;
-            countPct++;
-        }
-    });
-
-    const totC = gCupons.size;
-    const mediaPct = countPct ? (sumPctDesc / countPct) : 0;
-
-    document.getElementById('kpi-cupons').innerText = totC;
-    document.getElementById('kpi-lojas-vend').innerText = `${gLojas.size} / ${gVend.size}`;
-    document.getElementById('kpi-vendido').innerText = fmtBL.format(sumVendido);
-    document.getElementById('kpi-desconto').innerText = fmtBL.format(sumDesc);
-    document.getElementById('kpi-margem').innerText = fmtBL.format(sumMargem);
-    document.getElementById('kpi-pct-desc').innerText = `${mediaPct.toFixed(1)}% Médio`;
-
-    const sortArr = (obj) => Object.entries(obj).map(([k,v]) => ({nome: k, q: v.size})).sort((a,b)=> b.q - a.q);
-
-    const arrLojas = sortArr(pLoja);
-    const arrVend = sortArr(pVend);
-    const arrCats = sortArr(pCat);
-    
-    const alertBox = document.getElementById('alert-container');
-    alertBox.innerHTML = '';
-    const concentradas = arrLojas.filter(l => (l.q / totC) > 0.10);
-    concentradas.forEach(l => {
-        let pct = ((l.q / totC) * 100).toFixed(1);
-        alertBox.innerHTML += `<div class="alert"><strong>Loja ${l.nome}</strong> está concentrando ${pct}% (${l.q}) de todos os cupons da rede!</div>`;
-    });
-
-    const topLojas = arrLojas.slice(0, 15);
-    drawBarChart('chartLojas', topLojas.map(t=>t.nome), topLojas.map(t=>t.q), topLojas.map(t=>resolveColorSemaforo(t.q)));
-
-    const topVends = arrVend.slice(0, 10);
-    drawBarChart('chartVend', topVends.map(t=>t.nome), topVends.map(t=>t.q), topVends.map(t=>resolveColorSemaforo(t.q)));
-
-    const topCats = arrCats.slice(0, 12);
-    drawBarChart('chartCat', 
-        topCats.map(t=>t.nome.substring(0, 20)), topCats.map(t=>t.q), topCats.map(t=>'#0078d4'), 
-        true, { color: isDarkTheme ? '#ffffff' : '#1a1a1a' }
-    );
-
-    let arrLinha = sortArr(pLinha);
-    drawBarChart('chartLinhas', 
-        arrLinha.map(t=>t.nome), 
-        arrLinha.map(t=>t.q), 
-        arrLinha.map(t=>CORES_LINHA[t.nome] || CORES_LINHA["OUTROS"])
-    );
-
-    const orderDias = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
-    let diaData = orderDias.map(d => {
-        if(!pDia[d]) return {n: d, v: 0};
-        return { n: d, v: (pDia[d].size / (datasDiaUnico[d].size || 1)) };
-    }).filter(d => d.v > 0);
-    
-    let maxDia = Math.max(...diaData.map(d=>d.v));
-    drawBarChart('chartDias', diaData.map(d => d.n), diaData.map(d => parseFloat(d.v.toFixed(1))), 
-        diaData.map(d => d.v === maxDia ? '#ff6b6b' : '#0078d4'), false, { color: '#fff', align: 'start' }
-    );
-
-    let top8LojasNomes = arrLojas.slice(0,8).map(l => l.nome);
-    let dsFin = [
-        { label: 'Vendido Bruto (R$)', backgroundColor: '#378ADD', data: top8LojasNomes.map(n => financeiroLoja[n].v) },
-        { label: 'Margem (R$)', backgroundColor: '#1D9E75', data: top8LojasNomes.map(n => financeiroLoja[n].m) },
-        { label: 'Desconto (R$)', backgroundColor: '#D85A30', data: top8LojasNomes.map(n => financeiroLoja[n].d) }
-    ];
-    let compactLabels = top8LojasNomes.map(l => l.includes('-') ? l.split('-')[1].substring(0,10) : l.substring(0,10));
-    drawFinChart('chartFin', compactLabels, dsFin);
-
-    GLOBAL_EXPORT_DATA = { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja };
-    
-    // Gerar Resumo Executivo em Texto na Tela
-    gerarResumoExecutivoTexto(records, GLOBAL_EXPORT_DATA);
-}
-
-function gerarResumoExecutivoTexto(records, exportData) {
-    const { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja } = exportData;
-    const totC = arrLojas.reduce((a, b) => a + b.q, 0);
-
-    if (!totC) return;
-
-    const topLoja = arrLojas[0] || { nome: 'N/A', q: 0 };
-    const pctTopLoja = ((topLoja.q / totC) * 100).toFixed(1);
-
-    const lojasConcentradas = arrLojas.filter(l => (l.q / totC) > 0.10);
-    const mediaCuponsLoja = arrLojas.length ? (totC / arrLojas.length) : 0;
-    const lojasAcimaMedia = arrLojas.filter(l => l.q > mediaCuponsLoja * 1.25);
-
-    const topVend = arrVend[0] || { nome: 'N/A', q: 0 };
-    const pctTopVend = ((topVend.q / totC) * 100).toFixed(1);
-    const mediaCuponsVend = arrVend.length ? (totC / arrVend.length) : 0;
-    const vendsAcimaMedia = arrVend.filter(v => v.q > mediaCuponsVend * 1.25);
-
-    const topLinha = arrLinha[0] || { nome: 'N/A', q: 0 };
-    const pctTopLinha = ((topLinha.q / totC) * 100).toFixed(1);
-
-    let diaCritico = { n: 'N/A', v: 0 };
-    diaData.forEach(d => {
-        if (d.v > diaCritico.v) diaCritico = d;
-    });
-
-    const totVendidoStr = document.getElementById('kpi-vendido').innerText;
-    const totDescStr = document.getElementById('kpi-desconto').innerText;
-    const pctDescStr = document.getElementById('kpi-pct-desc').innerText;
-
-    // Texto Formatado Completo (Ideal para E-mail / WhatsApp / Apresentações)
-    const textoFormatado = `*RESUMO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS*
+            // Texto Formatado Completo (Ideal para E-mail / WhatsApp / Apresentações)
+            const textoFormatado = `*RESUMO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS*
 --------------------------------------------------
 📊 *VISÃO GERAL DO PERÍODO*:
 - Total de Cupons Emitidos: ${totC.toLocaleString('pt-BR')} cupons
@@ -1166,8 +1234,8 @@ function gerarResumoExecutivoTexto(records, exportData) {
 💡 *DIRETRIZ & RECOMENDAÇÃO GERENCIAL*:
 Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar o histórico do vendedor *${topVend.nome}*, que lideram os indicadores de exceções manuais.`;
 
-    const container = document.getElementById('summary-content');
-    container.innerHTML = `
+            const container = document.getElementById('summary-content');
+            container.innerHTML = `
         <div class="summary-grid">
             <div class="summary-item">
                 <div class="summary-item-header">📊 Visão Geral</div>
@@ -1206,427 +1274,475 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
         </div>
     `;
 
-    window.SUMMARY_TEXT_RAW = textoFormatado;
-}
+            window.SUMMARY_TEXT_RAW = textoFormatado;
+        }
 
-document.getElementById('btn-copy-summary').addEventListener('click', () => {
-    if (!window.SUMMARY_TEXT_RAW) return;
-    navigator.clipboard.writeText(window.SUMMARY_TEXT_RAW).then(() => {
-        const btn = document.getElementById('btn-copy-summary');
-        const origText = btn.innerHTML;
-        btn.innerHTML = '<span>✅</span> Copiado com Sucesso!';
-        btn.style.background = 'var(--color-green)';
-        setTimeout(() => {
-            btn.innerHTML = origText;
-            btn.style.background = '';
-        }, 2500);
-    });
-});
+        document.getElementById('btn-copy-summary').addEventListener('click', () => {
+            if (!window.SUMMARY_TEXT_RAW) return;
+            navigator.clipboard.writeText(window.SUMMARY_TEXT_RAW).then(() => {
+                const btn = document.getElementById('btn-copy-summary');
+                const origText = btn.innerHTML;
+                btn.innerHTML = '<span>✅</span> Copiado com Sucesso!';
+                btn.style.background = 'var(--color-green)';
+                setTimeout(() => {
+                    btn.innerHTML = origText;
+                    btn.style.background = '';
+                }, 2500);
+            });
+        });
 
-async function exportarExcelProfissional() {
-    if (!GLOBAL_RECORDS.length) return;
-    
-    const btnExport = document.getElementById('btn-export');
-    const origText = btnExport.innerHTML;
-    btnExport.disabled = true;
-    btnExport.innerHTML = '⏳ Gerando Excel Profissional...';
+        function obterIdentificadorSemana(records) {
+            if (!records || !records.length) return 'atual';
 
-    try {
-        const workbook = new ExcelJS.Workbook();
-        workbook.creator = 'FarmaPaulo - Análise de Cupons';
-        workbook.lastModifiedBy = 'FarmaPaulo';
-        workbook.created = new Date();
+            // 1. Verificar se existe alguma coluna explícita indicando a semana
+            for (let r of records) {
+                for (let key in r) {
+                    if (/semana/i.test(key) && r[key] !== null && r[key] !== undefined && String(r[key]).trim() !== '') {
+                        let val = String(r[key]).trim().replace(/^semana\s*/i, '');
+                        if (val) return val;
+                    }
+                }
+            }
 
-        const { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja } = GLOBAL_EXPORT_DATA;
-        const totCupons = arrLojas.reduce((a, b) => a + b.q, 0);
+            // 2. Extrair data de venda e calcular o número da semana no ano
+            let datasValidas = [];
+            for (let r of records) {
+                if (r.DataVenda) {
+                    let strDate = String(r.DataVenda).split(' ')[0];
+                    let parts = strDate.split('/');
+                    if (parts.length === 3) {
+                        let d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                        if (!isNaN(d.getTime())) {
+                            datasValidas.push(d);
+                        }
+                    }
+                }
+            }
 
-        // Estilos Padrão (Identidade Visual Vermelho Escuro / Executive)
-        const HEADER_BG = 'FFC0392B'; // #C0392B
-        const HEADER_FONT = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
-        const TITLE_FONT = { name: 'Segoe UI', size: 15, bold: true, color: { argb: 'FFFFFFFF' } };
-        const SUBTITLE_FONT = { name: 'Segoe UI', size: 10, italic: true, color: { argb: 'FF566573' } };
-        const THIN_BORDER = {
-            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
-            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
-            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
-            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
-        };
+            if (datasValidas.length > 0) {
+                datasValidas.sort((a, b) => a - b);
+                let firstDate = datasValidas[0];
+                let target = new Date(firstDate.valueOf());
+                let dayNr = (firstDate.getDay() + 6) % 7;
+                target.setDate(target.getDate() - dayNr + 3);
+                let firstThursday = target.valueOf();
+                target.setMonth(0, 1);
+                if (target.getDay() !== 4) {
+                    target.setMonth(0, 1 + ((4 - target.getDay() + 7) % 7));
+                }
+                let weekNo = 1 + Math.ceil((firstThursday - target) / 604800000);
+                return weekNo;
+            }
 
-        const formatHeaderRow = (row, height = 28) => {
-            row.height = height;
-            row.eachCell((cell) => {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
-                cell.font = HEADER_FONT;
-                cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-                cell.border = {
-                    top: { style: 'thin', color: { argb: 'FFA6ACAF' } },
-                    left: { style: 'thin', color: { argb: 'FFA6ACAF' } },
-                    bottom: { style: 'medium', color: { argb: 'FF922B21' } },
-                    right: { style: 'thin', color: { argb: 'FFA6ACAF' } }
+            return 'atual';
+        }
+
+        async function exportarExcelProfissional() {
+            if (!GLOBAL_RECORDS.length) return;
+
+            const btnExport = document.getElementById('btn-export');
+            const origText = btnExport.innerHTML;
+            btnExport.disabled = true;
+            btnExport.innerHTML = '⏳ Gerando Excel Profissional...';
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'FarmaPaulo - Análise de Cupons';
+                workbook.lastModifiedBy = 'FarmaPaulo';
+                workbook.created = new Date();
+
+                const { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja } = GLOBAL_EXPORT_DATA;
+                const totCupons = arrLojas.reduce((a, b) => a + b.q, 0);
+
+                // Estilos Padrão (Identidade Visual Vermelho Escuro / Executive)
+                const HEADER_BG = 'FFC0392B'; // #C0392B
+                const HEADER_FONT = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+                const TITLE_FONT = { name: 'Segoe UI', size: 15, bold: true, color: { argb: 'FFFFFFFF' } };
+                const SUBTITLE_FONT = { name: 'Segoe UI', size: 10, italic: true, color: { argb: 'FF566573' } };
+                const THIN_BORDER = {
+                    top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                    left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                    bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                    right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
                 };
-            });
-        };
 
-        const applyZebraAndBorders = (sheet, startRow = 2) => {
-            sheet.eachRow((row, rowNum) => {
-                if (rowNum < startRow) return;
-                const isEven = rowNum % 2 === 0;
-                const bgColor = isEven ? 'FFFFFFFF' : 'FFF9F9FB';
-                row.eachCell((cell) => {
-                    if (!cell.fill || !cell.fill.fgColor) {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
-                    }
-                    cell.border = THIN_BORDER;
-                    if (!cell.font || !cell.font.bold) {
-                        cell.font = { name: 'Segoe UI', size: 10 };
-                    }
+                const formatHeaderRow = (row, height = 28) => {
+                    row.height = height;
+                    row.eachCell((cell) => {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
+                        cell.font = HEADER_FONT;
+                        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFA6ACAF' } },
+                            left: { style: 'thin', color: { argb: 'FFA6ACAF' } },
+                            bottom: { style: 'medium', color: { argb: 'FF922B21' } },
+                            right: { style: 'thin', color: { argb: 'FFA6ACAF' } }
+                        };
+                    });
+                };
+
+                const applyZebraAndBorders = (sheet, startRow = 2) => {
+                    sheet.eachRow((row, rowNum) => {
+                        if (rowNum < startRow) return;
+                        const isEven = rowNum % 2 === 0;
+                        const bgColor = isEven ? 'FFFFFFFF' : 'FFF9F9FB';
+                        row.eachCell((cell) => {
+                            if (!cell.fill || !cell.fill.fgColor) {
+                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                            }
+                            cell.border = THIN_BORDER;
+                            if (!cell.font || !cell.font.bold) {
+                                cell.font = { name: 'Segoe UI', size: 10 };
+                            }
+                        });
+                    });
+                };
+
+                const autoFitColumns = (sheet) => {
+                    sheet.columns.forEach(column => {
+                        let maxLength = 0;
+                        column.eachCell({ includeEmpty: true }, cell => {
+                            let val = cell.value;
+                            if (val !== null && val !== undefined) {
+                                let str = typeof val === 'object' ? (val.result || JSON.stringify(val)) : String(val);
+                                if (str.length > maxLength) maxLength = str.length;
+                            }
+                        });
+                        column.width = Math.max(maxLength + 5, 14);
+                    });
+                };
+
+                // Extrair Período de Datas
+                let minDate = '', maxDate = '';
+                const datas = GLOBAL_RECORDS.map(r => String(r.DataVenda || '')).filter(d => d.length >= 8).sort();
+                if (datas.length) {
+                    minDate = datas[0].split(' ')[0];
+                    maxDate = datas[datas.length - 1].split(' ')[0];
+                }
+
+                // ==========================================
+                // 1. ABA RESUMO (CAPA)
+                // ==========================================
+                const wsResumo = workbook.addWorksheet('Resumo', { views: [{ showGridLines: true }] });
+
+                wsResumo.mergeCells('A1:E1');
+                const titleCell = wsResumo.getCell('A1');
+                titleCell.value = 'RELATÓRIO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS';
+                titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
+                titleCell.font = TITLE_FONT;
+                titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+                wsResumo.getRow(1).height = 40;
+
+                wsResumo.mergeCells('A2:E2');
+                const subCell = wsResumo.getCell('A2');
+                subCell.value = 'Farmácias São Paulo | Controle Gerencial de Descontos e Exceções Operacionais';
+                subCell.font = SUBTITLE_FONT;
+                subCell.alignment = { vertical: 'middle', horizontal: 'center' };
+                wsResumo.getRow(2).height = 20;
+
+                wsResumo.addRow([]); // Espaço
+
+                const kpiHeaderRow = wsResumo.addRow(['Indicador / Métrica', 'Valor Apurado', 'Data de Geração', 'Período Analisado']);
+                formatHeaderRow(kpiHeaderRow);
+
+                const totVendido = document.getElementById('kpi-vendido').innerText;
+                const totDesc = document.getElementById('kpi-desconto').innerText;
+                const pctDesc = document.getElementById('kpi-pct-desc').innerText;
+                const lojasVendAtivos = document.getElementById('kpi-lojas-vend').innerText;
+                const dataGeracao = new Date().toLocaleString('pt-BR');
+                const periodoStr = (minDate && maxDate) ? `${minDate} até ${maxDate}` : 'Completo';
+
+                const rowKpis = [
+                    ['Total de Cupons Emitidos', totCupons, dataGeracao, periodoStr],
+                    ['Total Vendido Bruto', totVendido, '', ''],
+                    ['Total em Descontos', totDesc, '', ''],
+                    ['Percentual Médio de Desconto', pctDesc, '', ''],
+                    ['Lojas / Vendedores Ativos', lojasVendAtivos, '', '']
+                ];
+
+                rowKpis.forEach(r => wsResumo.addRow(r));
+                applyZebraAndBorders(wsResumo, 4);
+
+                wsResumo.addRow([]); // Espaço
+
+                // Caixa de Lembrete Visual (Callout Box)
+                wsResumo.mergeCells('A11:E11');
+                const calloutHeader = wsResumo.getCell('A11');
+                calloutHeader.value = '💡 DIRETRIZ DE AVALIAÇÃO DE PERFORMANCE';
+                calloutHeader.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF7D6608' } };
+                calloutHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFCF3CF' } };
+                calloutHeader.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+                wsResumo.getRow(11).height = 24;
+
+                wsResumo.mergeCells('A12:E13');
+                const calloutBody = wsResumo.getCell('A12');
+                calloutBody.value = 'Quanto MENOR o número de cupons emitidos por loja ou vendedor, MELHOR é o desempenho operacional.\nVolume elevado de cupons sinaliza alta incidência de concessão de descontos e exceções manuais.';
+                calloutBody.font = { name: 'Segoe UI', size: 10, italic: true, color: { argb: 'FF7D6608' } };
+                calloutBody.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDFEFE' } };
+                calloutBody.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true, indent: 1 };
+
+                ['A11', 'B11', 'C11', 'D11', 'E11', 'A12', 'B12', 'C12', 'D12', 'E12', 'A13', 'B13', 'C13', 'D13', 'E13'].forEach(addr => {
+                    wsResumo.getCell(addr).border = {
+                        top: { style: 'thin', color: { argb: 'FFF1C40F' } },
+                        left: { style: 'thin', color: { argb: 'FFF1C40F' } },
+                        bottom: { style: 'thin', color: { argb: 'FFF1C40F' } },
+                        right: { style: 'thin', color: { argb: 'FFF1C40F' } }
+                    };
                 });
-            });
-        };
 
-        const autoFitColumns = (sheet) => {
-            sheet.columns.forEach(column => {
-                let maxLength = 0;
-                column.eachCell({ includeEmpty: true }, cell => {
-                    let val = cell.value;
-                    if (val !== null && val !== undefined) {
-                        let str = typeof val === 'object' ? (val.result || JSON.stringify(val)) : String(val);
-                        if (str.length > maxLength) maxLength = str.length;
+                autoFitColumns(wsResumo);
+
+
+                // ==========================================
+                // 2. ABA POR LOJA (COM FORMATAÇÃO CONDICIONAL & STATUS)
+                // ==========================================
+                const wsLojas = workbook.addWorksheet('Por Loja', { views: [{ state: 'frozen', ySplit: 1 }] });
+                const hLojas = wsLojas.addRow(['Posição', 'Código / Loja', 'Qtd. Cupons', '% do Total', 'Vendido Bruto (R$)', 'Descontos (R$)', 'Margem Bruta (R$)', 'Status Performance']);
+                formatHeaderRow(hLojas);
+
+                const mediaCuponsLoja = arrLojas.length ? (totCupons / arrLojas.length) : 0;
+
+                arrLojas.forEach((l, idx) => {
+                    const pct = totCupons > 0 ? (l.q / totCupons) : 0;
+                    const fin = financeiroLoja[l.nome] || { v: 0, d: 0, m: 0 };
+
+                    let statusText = '🟡 Dentro da média';
+                    let statusBg = 'FFFCF3CF';
+                    let statusFg = 'FF7D6608';
+
+                    if (l.q > mediaCuponsLoja * 1.25) {
+                        statusText = '🔴 Acima da média (Alerta)';
+                        statusBg = 'FFFADBD8';
+                        statusFg = 'FF78281F';
+                    } else if (l.q < mediaCuponsLoja * 0.75) {
+                        statusText = '🟢 Abaixo da média (Bom)';
+                        statusBg = 'FFD4EFDF';
+                        statusFg = 'FF145A32';
                     }
-                });
-                column.width = Math.max(maxLength + 5, 14);
-            });
-        };
 
-        // Extrair Período de Datas
-        let minDate = '', maxDate = '';
-        const datas = GLOBAL_RECORDS.map(r => String(r.DataVenda || '')).filter(d => d.length >= 8).sort();
-        if (datas.length) {
-            minDate = datas[0].split(' ')[0];
-            maxDate = datas[datas.length - 1].split(' ')[0];
+                    const row = wsLojas.addRow([
+                        idx + 1,
+                        l.nome,
+                        l.q,
+                        pct,
+                        fin.v,
+                        fin.d,
+                        fin.m,
+                        statusText
+                    ]);
+
+                    row.getCell(3).numFmt = '#,##0';
+                    row.getCell(4).numFmt = '0.0%';
+                    row.getCell(5).numFmt = 'R$ #,##0.00';
+                    row.getCell(6).numFmt = 'R$ #,##0.00';
+                    row.getCell(7).numFmt = 'R$ #,##0.00';
+
+                    const cellQtd = row.getCell(3);
+                    const cellStatus = row.getCell(8);
+
+                    cellQtd.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    cellQtd.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+
+                    cellStatus.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    cellStatus.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                    cellStatus.alignment = { horizontal: 'center' };
+                });
+
+                applyZebraAndBorders(wsLojas, 2);
+                autoFitColumns(wsLojas);
+
+
+                // ==========================================
+                // 3. ABA POR VENDEDOR
+                // ==========================================
+                const wsVend = workbook.addWorksheet('Por Vendedor', { views: [{ state: 'frozen', ySplit: 1 }] });
+                const hVend = wsVend.addRow(['Posição', 'Nome do Vendedor', 'Qtd. Cupons', '% do Total', 'Status Performance']);
+                formatHeaderRow(hVend);
+
+                const mediaCuponsVend = arrVend.length ? (totCupons / arrVend.length) : 0;
+
+                arrVend.forEach((v, idx) => {
+                    const pct = totCupons > 0 ? (v.q / totCupons) : 0;
+
+                    let statusText = '🟡 Dentro da média';
+                    let statusBg = 'FFFCF3CF';
+                    let statusFg = 'FF7D6608';
+
+                    if (v.q > mediaCuponsVend * 1.25) {
+                        statusText = '🔴 Acima da média (Alerta)';
+                        statusBg = 'FFFADBD8';
+                        statusFg = 'FF78281F';
+                    } else if (v.q < mediaCuponsVend * 0.75) {
+                        statusText = '🟢 Abaixo da média (Bom)';
+                        statusBg = 'FFD4EFDF';
+                        statusFg = 'FF145A32';
+                    }
+
+                    const row = wsVend.addRow([
+                        idx + 1,
+                        v.nome,
+                        v.q,
+                        pct,
+                        statusText
+                    ]);
+
+                    row.getCell(3).numFmt = '#,##0';
+                    row.getCell(4).numFmt = '0.0%';
+
+                    const cellQtd = row.getCell(3);
+                    const cellStatus = row.getCell(5);
+
+                    cellQtd.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    cellQtd.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+
+                    cellStatus.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    cellStatus.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                    cellStatus.alignment = { horizontal: 'center' };
+                });
+
+                applyZebraAndBorders(wsVend, 2);
+                autoFitColumns(wsVend);
+
+
+                // ==========================================
+                // 4. ABA POR TIPO DE DESCONTO
+                // ==========================================
+                const wsTipo = workbook.addWorksheet('Por Tipo de Desconto', { views: [{ state: 'frozen', ySplit: 1 }] });
+                const hTipo = wsTipo.addRow(['Posição', 'Linha de Medicamento / Categoria', 'Qtd. Cupons', '% do Total']);
+                formatHeaderRow(hTipo);
+
+                arrLinha.forEach((l, idx) => {
+                    const pct = totCupons > 0 ? (l.q / totCupons) : 0;
+                    const row = wsTipo.addRow([idx + 1, l.nome, l.q, pct]);
+                    row.getCell(3).numFmt = '#,##0';
+                    row.getCell(4).numFmt = '0.0%';
+                });
+
+                applyZebraAndBorders(wsTipo, 2);
+                autoFitColumns(wsTipo);
+
+
+                // ==========================================
+                // 5. ABA POR DIA
+                // ==========================================
+                const wsDia = workbook.addWorksheet('Por Dia', { views: [{ state: 'frozen', ySplit: 1 }] });
+                const hDia = wsDia.addRow(['Dia da Semana', 'Média de Cupons / Dia', '% do Total']);
+                formatHeaderRow(hDia);
+
+                const sumMediaDia = diaData.reduce((a, b) => a + b.v, 0);
+
+                diaData.forEach((d) => {
+                    const pct = sumMediaDia > 0 ? (d.v / sumMediaDia) : 0;
+                    const row = wsDia.addRow([d.n, d.v, pct]);
+                    row.getCell(2).numFmt = '#,##0.0';
+                    row.getCell(3).numFmt = '0.0%';
+                });
+
+                applyZebraAndBorders(wsDia, 2);
+                autoFitColumns(wsDia);
+
+
+                // ==========================================
+                // 6. ABA GRÁFICOS (LAYOUT EM 2 COLUNAS CONFORME DESIGN DA IMAGEM)
+                // ==========================================
+                const wsGraficos = workbook.addWorksheet('Gráficos', { views: [{ showGridLines: true }] });
+
+                const getExportableChartImage = (canvas) => {
+                    if (!canvas) return null;
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = canvas.width;
+                    tempCanvas.height = canvas.height;
+                    const ctx = tempCanvas.getContext('2d');
+
+                    // Fundo escuro idêntico ao do dashboard (#181818)
+                    ctx.fillStyle = isDarkTheme ? '#181818' : '#ffffff';
+                    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    ctx.drawImage(canvas, 0, 0);
+                    return tempCanvas.toDataURL('image/png');
+                };
+
+                const chartPairs = [
+                    [
+                        { id: 'chartLojas', title: '1. Ranking de Cupons por Loja' },
+                        { id: 'chartVend', title: '2. Top Vendedores com Mais Cupons' }
+                    ],
+                    [
+                        { id: 'chartCat', title: '3. Distribuição por Categoria de Produto' },
+                        { id: 'chartLinhas', title: '4. Distribuição por Linha de Medicamentos' }
+                    ],
+                    [
+                        { id: 'chartDias', title: '5. Média de Cupons por Dia da Semana' },
+                        { id: 'chartFin', title: '6. Análise Financeira: Vendido vs Margem vs Desconto' }
+                    ]
+                ];
+
+                let startRow = 1;
+
+                for (const pair of chartPairs) {
+                    const leftChart = pair[0];
+                    const rightChart = pair[1];
+
+                    // Gráfico da Esquerda (Coluna A)
+                    if (leftChart) {
+                        const cellL = wsGraficos.getCell(`A${startRow}`);
+                        cellL.value = leftChart.title;
+                        cellL.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
+
+                        const canvasL = document.getElementById(leftChart.id);
+                        if (canvasL) {
+                            const imgDataL = getExportableChartImage(canvasL);
+                            const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
+                            wsGraficos.addImage(imageIdL, {
+                                tl: { col: 0, row: startRow }, // Coluna A (col: 0), Linha startRow
+                                ext: { width: 590, height: 320 }
+                            });
+                        }
+                    }
+
+                    // Gráfico da Direita (Coluna O)
+                    if (rightChart) {
+                        const cellR = wsGraficos.getCell(`O${startRow}`);
+                        cellR.value = rightChart.title;
+                        cellR.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
+
+                        const canvasR = document.getElementById(rightChart.id);
+                        if (canvasR) {
+                            const imgDataR = getExportableChartImage(canvasR);
+                            const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
+                            wsGraficos.addImage(imageIdR, {
+                                tl: { col: 14, row: startRow }, // Coluna O (col: 14), Linha startRow
+                                ext: { width: 590, height: 320 }
+                            });
+                        }
+                    }
+
+                    wsGraficos.getRow(startRow).height = 20;
+                    startRow += 19; // Avança 19 linhas (1 título + ~17 altura imagem + 1 espaço)
+                }
+
+                // ==========================================
+                // DOWNLOAD DO ARQUIVO .XLSX
+                // ==========================================
+                const semanaId = obterIdentificadorSemana(GLOBAL_RECORDS);
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `relatorio da semana ${semanaId}.xlsx`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+            } catch (err) {
+                console.error('Erro ao gerar Excel profissional:', err);
+                alert('Ocorreu um erro ao gerar o relatório Excel: ' + err.message);
+            } finally {
+                btnExport.disabled = false;
+                btnExport.innerHTML = origText;
+            }
         }
 
-        // ==========================================
-        // 1. ABA RESUMO (CAPA)
-        // ==========================================
-        const wsResumo = workbook.addWorksheet('Resumo', { views: [{ showGridLines: true }] });
-        
-        wsResumo.mergeCells('A1:E1');
-        const titleCell = wsResumo.getCell('A1');
-        titleCell.value = 'RELATÓRIO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS';
-        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
-        titleCell.font = TITLE_FONT;
-        titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
-        wsResumo.getRow(1).height = 40;
-
-        wsResumo.mergeCells('A2:E2');
-        const subCell = wsResumo.getCell('A2');
-        subCell.value = 'Farmácias São Paulo | Controle Gerencial de Descontos e Exceções Operacionais';
-        subCell.font = SUBTITLE_FONT;
-        subCell.alignment = { vertical: 'middle', horizontal: 'center' };
-        wsResumo.getRow(2).height = 20;
-
-        wsResumo.addRow([]); // Espaço
-
-        const kpiHeaderRow = wsResumo.addRow(['Indicador / Métrica', 'Valor Apurado', 'Data de Geração', 'Período Analisado']);
-        formatHeaderRow(kpiHeaderRow);
-
-        const totVendido = document.getElementById('kpi-vendido').innerText;
-        const totDesc = document.getElementById('kpi-desconto').innerText;
-        const pctDesc = document.getElementById('kpi-pct-desc').innerText;
-        const lojasVendAtivos = document.getElementById('kpi-lojas-vend').innerText;
-        const dataGeracao = new Date().toLocaleString('pt-BR');
-        const periodoStr = (minDate && maxDate) ? `${minDate} até ${maxDate}` : 'Completo';
-
-        const rowKpis = [
-            ['Total de Cupons Emitidos', totCupons, dataGeracao, periodoStr],
-            ['Total Vendido Bruto', totVendido, '', ''],
-            ['Total em Descontos', totDesc, '', ''],
-            ['Percentual Médio de Desconto', pctDesc, '', ''],
-            ['Lojas / Vendedores Ativos', lojasVendAtivos, '', '']
-        ];
-
-        rowKpis.forEach(r => wsResumo.addRow(r));
-        applyZebraAndBorders(wsResumo, 4);
-
-        wsResumo.addRow([]); // Espaço
-
-        // Caixa de Lembrete Visual (Callout Box)
-        wsResumo.mergeCells('A11:E11');
-        const calloutHeader = wsResumo.getCell('A11');
-        calloutHeader.value = '💡 DIRETRIZ DE AVALIAÇÃO DE PERFORMANCE';
-        calloutHeader.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF7D6608' } };
-        calloutHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFCF3CF' } };
-        calloutHeader.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
-        wsResumo.getRow(11).height = 24;
-
-        wsResumo.mergeCells('A12:E13');
-        const calloutBody = wsResumo.getCell('A12');
-        calloutBody.value = 'Quanto MENOR o número de cupons emitidos por loja ou vendedor, MELHOR é o desempenho operacional.\nVolume elevado de cupons sinaliza alta incidência de concessão de descontos e exceções manuais.';
-        calloutBody.font = { name: 'Segoe UI', size: 10, italic: true, color: { argb: 'FF7D6608' } };
-        calloutBody.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDFEFE' } };
-        calloutBody.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true, indent: 1 };
-
-        ['A11','B11','C11','D11','E11','A12','B12','C12','D12','E12','A13','B13','C13','D13','E13'].forEach(addr => {
-            wsResumo.getCell(addr).border = {
-                top: { style: 'thin', color: { argb: 'FFF1C40F' } },
-                left: { style: 'thin', color: { argb: 'FFF1C40F' } },
-                bottom: { style: 'thin', color: { argb: 'FFF1C40F' } },
-                right: { style: 'thin', color: { argb: 'FFF1C40F' } }
-            };
-        });
-
-        autoFitColumns(wsResumo);
-
-
-        // ==========================================
-        // 2. ABA POR LOJA (COM FORMATAÇÃO CONDICIONAL & STATUS)
-        // ==========================================
-        const wsLojas = workbook.addWorksheet('Por Loja', { views: [{ state: 'frozen', ySplit: 1 }] });
-        const hLojas = wsLojas.addRow(['Posição', 'Código / Loja', 'Qtd. Cupons', '% do Total', 'Vendido Bruto (R$)', 'Descontos (R$)', 'Margem Bruta (R$)', 'Status Performance']);
-        formatHeaderRow(hLojas);
-
-        const mediaCuponsLoja = arrLojas.length ? (totCupons / arrLojas.length) : 0;
-
-        arrLojas.forEach((l, idx) => {
-            const pct = totCupons > 0 ? (l.q / totCupons) : 0;
-            const fin = financeiroLoja[l.nome] || { v: 0, d: 0, m: 0 };
-            
-            let statusText = '🟡 Dentro da média';
-            let statusBg = 'FFFCF3CF';
-            let statusFg = 'FF7D6608';
-
-            if (l.q > mediaCuponsLoja * 1.25) {
-                statusText = '🔴 Acima da média (Alerta)';
-                statusBg = 'FFFADBD8';
-                statusFg = 'FF78281F';
-            } else if (l.q < mediaCuponsLoja * 0.75) {
-                statusText = '🟢 Abaixo da média (Bom)';
-                statusBg = 'FFD4EFDF';
-                statusFg = 'FF145A32';
-            }
-
-            const row = wsLojas.addRow([
-                idx + 1,
-                l.nome,
-                l.q,
-                pct,
-                fin.v,
-                fin.d,
-                fin.m,
-                statusText
-            ]);
-
-            row.getCell(3).numFmt = '#,##0';
-            row.getCell(4).numFmt = '0.0%';
-            row.getCell(5).numFmt = 'R$ #,##0.00';
-            row.getCell(6).numFmt = 'R$ #,##0.00';
-            row.getCell(7).numFmt = 'R$ #,##0.00';
-
-            const cellQtd = row.getCell(3);
-            const cellStatus = row.getCell(8);
-            
-            cellQtd.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-            cellQtd.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-            cellStatus.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-            cellStatus.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-            cellStatus.alignment = { horizontal: 'center' };
-        });
-
-        applyZebraAndBorders(wsLojas, 2);
-        autoFitColumns(wsLojas);
-
-
-        // ==========================================
-        // 3. ABA POR VENDEDOR
-        // ==========================================
-        const wsVend = workbook.addWorksheet('Por Vendedor', { views: [{ state: 'frozen', ySplit: 1 }] });
-        const hVend = wsVend.addRow(['Posição', 'Nome do Vendedor', 'Qtd. Cupons', '% do Total', 'Status Performance']);
-        formatHeaderRow(hVend);
-
-        const mediaCuponsVend = arrVend.length ? (totCupons / arrVend.length) : 0;
-
-        arrVend.forEach((v, idx) => {
-            const pct = totCupons > 0 ? (v.q / totCupons) : 0;
-
-            let statusText = '🟡 Dentro da média';
-            let statusBg = 'FFFCF3CF';
-            let statusFg = 'FF7D6608';
-
-            if (v.q > mediaCuponsVend * 1.25) {
-                statusText = '🔴 Acima da média (Alerta)';
-                statusBg = 'FFFADBD8';
-                statusFg = 'FF78281F';
-            } else if (v.q < mediaCuponsVend * 0.75) {
-                statusText = '🟢 Abaixo da média (Bom)';
-                statusBg = 'FFD4EFDF';
-                statusFg = 'FF145A32';
-            }
-
-            const row = wsVend.addRow([
-                idx + 1,
-                v.nome,
-                v.q,
-                pct,
-                statusText
-            ]);
-
-            row.getCell(3).numFmt = '#,##0';
-            row.getCell(4).numFmt = '0.0%';
-
-            const cellQtd = row.getCell(3);
-            const cellStatus = row.getCell(5);
-
-            cellQtd.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-            cellQtd.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-            cellStatus.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-            cellStatus.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-            cellStatus.alignment = { horizontal: 'center' };
-        });
-
-        applyZebraAndBorders(wsVend, 2);
-        autoFitColumns(wsVend);
-
-
-        // ==========================================
-        // 4. ABA POR TIPO DE DESCONTO
-        // ==========================================
-        const wsTipo = workbook.addWorksheet('Por Tipo de Desconto', { views: [{ state: 'frozen', ySplit: 1 }] });
-        const hTipo = wsTipo.addRow(['Posição', 'Linha de Medicamento / Categoria', 'Qtd. Cupons', '% do Total']);
-        formatHeaderRow(hTipo);
-
-        arrLinha.forEach((l, idx) => {
-            const pct = totCupons > 0 ? (l.q / totCupons) : 0;
-            const row = wsTipo.addRow([idx + 1, l.nome, l.q, pct]);
-            row.getCell(3).numFmt = '#,##0';
-            row.getCell(4).numFmt = '0.0%';
-        });
-
-        applyZebraAndBorders(wsTipo, 2);
-        autoFitColumns(wsTipo);
-
-
-        // ==========================================
-        // 5. ABA POR DIA
-        // ==========================================
-        const wsDia = workbook.addWorksheet('Por Dia', { views: [{ state: 'frozen', ySplit: 1 }] });
-        const hDia = wsDia.addRow(['Dia da Semana', 'Média de Cupons / Dia', '% do Total']);
-        formatHeaderRow(hDia);
-
-        const sumMediaDia = diaData.reduce((a, b) => a + b.v, 0);
-
-        diaData.forEach((d) => {
-            const pct = sumMediaDia > 0 ? (d.v / sumMediaDia) : 0;
-            const row = wsDia.addRow([d.n, d.v, pct]);
-            row.getCell(2).numFmt = '#,##0.0';
-            row.getCell(3).numFmt = '0.0%';
-        });
-
-        applyZebraAndBorders(wsDia, 2);
-        autoFitColumns(wsDia);
-
-
-        // ==========================================
-        // 6. ABA GRÁFICOS (LAYOUT EM 2 COLUNAS CONFORME DESIGN DA IMAGEM)
-        // ==========================================
-        const wsGraficos = workbook.addWorksheet('Gráficos', { views: [{ showGridLines: true }] });
-        
-        const getExportableChartImage = (canvas) => {
-            if (!canvas) return null;
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const ctx = tempCanvas.getContext('2d');
-            
-            // Fundo escuro idêntico ao do dashboard (#181818)
-            ctx.fillStyle = isDarkTheme ? '#181818' : '#ffffff';
-            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            ctx.drawImage(canvas, 0, 0);
-            return tempCanvas.toDataURL('image/png');
-        };
-
-        const chartPairs = [
-            [
-                { id: 'chartLojas', title: '1. Ranking de Cupons por Loja' },
-                { id: 'chartVend', title: '2. Top Vendedores com Mais Cupons' }
-            ],
-            [
-                { id: 'chartCat', title: '3. Distribuição por Categoria de Produto' },
-                { id: 'chartLinhas', title: '4. Distribuição por Linha de Medicamentos' }
-            ],
-            [
-                { id: 'chartDias', title: '5. Média de Cupons por Dia da Semana' },
-                { id: 'chartFin', title: '6. Análise Financeira: Vendido vs Margem vs Desconto' }
-            ]
-        ];
-
-        let startRow = 1;
-
-        for (const pair of chartPairs) {
-            const leftChart = pair[0];
-            const rightChart = pair[1];
-
-            // Gráfico da Esquerda (Coluna A)
-            if (leftChart) {
-                const cellL = wsGraficos.getCell(`A${startRow}`);
-                cellL.value = leftChart.title;
-                cellL.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
-                
-                const canvasL = document.getElementById(leftChart.id);
-                if (canvasL) {
-                    const imgDataL = getExportableChartImage(canvasL);
-                    const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
-                    wsGraficos.addImage(imageIdL, {
-                        tl: { col: 0, row: startRow }, // Coluna A (col: 0), Linha startRow
-                        ext: { width: 590, height: 320 }
-                    });
-                }
-            }
-
-            // Gráfico da Direita (Coluna O)
-            if (rightChart) {
-                const cellR = wsGraficos.getCell(`O${startRow}`);
-                cellR.value = rightChart.title;
-                cellR.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
-
-                const canvasR = document.getElementById(rightChart.id);
-                if (canvasR) {
-                    const imgDataR = getExportableChartImage(canvasR);
-                    const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
-                    wsGraficos.addImage(imageIdR, {
-                        tl: { col: 14, row: startRow }, // Coluna O (col: 14), Linha startRow
-                        ext: { width: 590, height: 320 }
-                    });
-                }
-            }
-
-            wsGraficos.getRow(startRow).height = 20;
-            startRow += 19; // Avança 19 linhas (1 título + ~17 altura imagem + 1 espaço)
-        }
-
-        // ==========================================
-        // DOWNLOAD DO ARQUIVO .XLSX
-        // ==========================================
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Relatorio_Analise_Cupons_FarmaPaulo_${new Date().toISOString().slice(0, 10)}.xlsx`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-
-    } catch (err) {
-        console.error('Erro ao gerar Excel profissional:', err);
-        alert('Ocorreu um erro ao gerar o relatório Excel: ' + err.message);
-    } finally {
-        btnExport.disabled = false;
-        btnExport.innerHTML = origText;
-    }
-}
-
-document.getElementById('btn-export').addEventListener('click', exportarExcelProfissional);
-</script>
+        document.getElementById('btn-export').addEventListener('click', exportarExcelProfissional);
+    </script>
 </body>
+
 </html>
