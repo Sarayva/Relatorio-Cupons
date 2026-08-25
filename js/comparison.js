@@ -45,7 +45,8 @@ function agruparPorSemanas(records) {
     const semanasMap = {};
 
     records.forEach(r => {
-        let intervalo = getWeekInterval(r.DataVenda);
+        let dataRaw = getFieldValue(r, 'data');
+        let intervalo = getWeekInterval(dataRaw);
         if (!intervalo) return;
 
         if (!semanasMap[intervalo]) {
@@ -65,13 +66,13 @@ function agruparPorSemanas(records) {
         }
 
         let sem = semanasMap[intervalo];
-        let nr = r.NrCupom;
+        let nr = getFieldValue(r, 'cupom');
         if (nr) sem.cupons.add(nr);
 
-        let codF = parseInt(r.CodFilial);
-        let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${r.CodFilial}`;
-        let vend = r.NmVendedor || 'N/A';
-        let cat = r.NmCategoria || 'N/A';
+        let codF = parseInt(getFieldValue(r, 'loja'));
+        let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${codF || r.CodFilial || 'N/A'}`;
+        let vend = getFieldValue(r, 'vendedor');
+        let cat = getFieldValue(r, 'categoria');
         let linha = classificaLinha(cat);
 
         if (!sem.lojas[loja]) sem.lojas[loja] = new Set();
@@ -86,16 +87,16 @@ function agruparPorSemanas(records) {
         if (!sem.categorias[cat]) sem.categorias[cat] = new Set();
         if (nr) sem.categorias[cat].add(nr);
 
-        let vVenda = parseStrToNum(r.VlrVenda);
-        let vDesc = parseStrToNum(r.VlrDescItens);
-        let vMargem = parseStrToNum(r.VlrMargemBruta);
-        let vPct = parseStrToNum(r['%DescontoFinal']);
+        let vVenda = parseStrToNum(getFieldValue(r, 'venda'));
+        let vDesc = parseStrToNum(getFieldValue(r, 'desconto'));
+        let vMargem = parseStrToNum(getFieldValue(r, 'margem'));
+        let vPct = parseStrToNum(getFieldValue(r, 'pct'));
 
         if (!isNaN(vVenda)) sem.vendaTotal += vVenda;
         if (!isNaN(vDesc)) sem.descontoTotal += vDesc;
         if (!isNaN(vMargem)) sem.margemTotal += vMargem;
 
-        if (vPct > 0 || r['%DescontoFinal'] != undefined) {
+        if (vPct > 0 || getFieldValue(r, 'pct') != undefined) {
             sem.sumPctDesc += vPct;
             sem.countPct++;
         }
@@ -208,13 +209,13 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
 
     const processarMes = (recs, targetMap) => {
         recs.forEach(r => {
-            let nr = r.NrCupom;
+            let nr = getFieldValue(r, 'cupom');
             if (nr) targetMap.cupons.add(nr);
 
-            let codF = parseInt(r.CodFilial);
-            let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${r.CodFilial}`;
-            let vend = r.NmVendedor || 'N/A';
-            let cat = r.NmCategoria || 'N/A';
+            let codF = parseInt(getFieldValue(r, 'loja'));
+            let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${codF || r.CodFilial || 'N/A'}`;
+            let vend = getFieldValue(r, 'vendedor');
+            let cat = getFieldValue(r, 'categoria');
             let linha = classificaLinha(cat);
 
             if (!targetMap.lojas[loja]) targetMap.lojas[loja] = new Set();
@@ -229,16 +230,16 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
             if (!targetMap.categorias[cat]) targetMap.categorias[cat] = new Set();
             if (nr) targetMap.categorias[cat].add(nr);
 
-            let vVenda = parseStrToNum(r.VlrVenda);
-            let vDesc = parseStrToNum(r.VlrDescItens);
-            let vMargem = parseStrToNum(r.VlrMargemBruta);
-            let vPct = parseStrToNum(r['%DescontoFinal']);
+            let vVenda = parseStrToNum(getFieldValue(r, 'venda'));
+            let vDesc = parseStrToNum(getFieldValue(r, 'desconto'));
+            let vMargem = parseStrToNum(getFieldValue(r, 'margem'));
+            let vPct = parseStrToNum(getFieldValue(r, 'pct'));
 
             if (!isNaN(vVenda)) targetMap.vendaTotal += vVenda;
             if (!isNaN(vDesc)) targetMap.descontoTotal += vDesc;
             if (!isNaN(vMargem)) targetMap.margemTotal += vMargem;
 
-            if (vPct > 0 || r['%DescontoFinal'] != undefined) {
+            if (vPct > 0 || getFieldValue(r, 'pct') != undefined) {
                 targetMap.sumPctDesc += vPct;
                 targetMap.countPct++;
             }

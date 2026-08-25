@@ -152,17 +152,17 @@ function initDragAndDrop() {
 
 function parseExcelRecords(sheetData) {
     let headerIdx = -1;
-    for (let i = 0; i < Math.min(sheetData.length, 25); i++) {
-        const rowStr = JSON.stringify(sheetData[i]).toUpperCase();
-        if (rowStr.includes("CODVENDEDOR") || rowStr.includes("NMCATEGORIA") || rowStr.includes("NVR")) {
+    for (let i = 0; i < Math.min(sheetData.length, 30); i++) {
+        const rowStr = JSON.stringify(sheetData[i] || []).toUpperCase();
+        if (rowStr.includes("VENDEDOR") || rowStr.includes("CATEGOR") || rowStr.includes("CUPOM") || rowStr.includes("FILIAL") || rowStr.includes("LOJA") || rowStr.includes("NVR")) {
             headerIdx = i;
             break;
         }
     }
 
     if (headerIdx === -1) {
-        for (let i = 0; i < Math.min(sheetData.length, 10); i++) {
-            if (sheetData[i] && sheetData[i].length >= 5) {
+        for (let i = 0; i < Math.min(sheetData.length, 15); i++) {
+            if (sheetData[i] && sheetData[i].length >= 3) {
                 headerIdx = i;
                 break;
             }
@@ -191,7 +191,8 @@ function parseExcelRecords(sheetData) {
                 lastSeen[h] = val;
                 hasValue = true;
             } else {
-                if (['CodFilial', 'DataVenda', 'NrCupom', 'CodVendedor', 'NmVendedor'].includes(h)) {
+                let hUpper = h.toUpperCase();
+                if (hUpper.includes('FILIAL') || hUpper.includes('LOJA') || hUpper.includes('DATA') || hUpper.includes('CUPOM') || hUpper.includes('VENDEDOR')) {
                     obj[h] = lastSeen[h];
                 } else {
                     obj[h] = val;
