@@ -6,6 +6,7 @@ let isDarkTheme = true;
 let GLOBAL_RECORDS = [];
 let GLOBAL_EXPORT_DATA = {};
 let chartsObj = {};
+let tempDualFileA = null;
 
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -56,6 +57,7 @@ function initBrandHomeNav() {
     const headerBrand = document.querySelector('.header-brand');
     if (headerBrand) {
         headerBrand.addEventListener('click', () => {
+            tempDualFileA = null;
             document.getElementById('dash-header').classList.add('hidden');
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('view-mode-bar').classList.add('hidden');
@@ -108,10 +110,24 @@ function initFileInputs() {
     const fileInputDual = document.getElementById('file-input-dual');
     if (fileInputDual) {
         fileInputDual.addEventListener('change', e => {
-            if (e.target.files.length >= 2) {
-                processDualFiles(e.target.files[0], e.target.files[1]);
-            } else if (e.target.files.length === 1) {
-                alert('Por favor, selecione 2 arquivos de meses fechados para realizar o comparativo mensal.');
+            const files = Array.from(e.target.files);
+            if (files.length >= 2) {
+                tempDualFileA = null;
+                processDualFiles(files[0], files[1]);
+                fileInputDual.value = '';
+            } else if (files.length === 1) {
+                if (!tempDualFileA) {
+                    tempDualFileA = files[0];
+                    fileInputDual.value = '';
+                    alert(`1º Arquivo Selecionado: "${tempDualFileA.name}"!\n\nAgora selecione o 2º arquivo de mês fechado para comparar.`);
+                    setTimeout(() => fileInputDual.click(), 300);
+                } else {
+                    const fileB = files[0];
+                    const fileA = tempDualFileA;
+                    tempDualFileA = null;
+                    fileInputDual.value = '';
+                    processDualFiles(fileA, fileB);
+                }
             }
         });
     }
@@ -141,10 +157,20 @@ function initDragAndDrop() {
     window.addEventListener('drop', e => {
         e.preventDefault();
         if (e.dataTransfer && e.dataTransfer.files) {
-            if (e.dataTransfer.files.length >= 2) {
-                processDualFiles(e.dataTransfer.files[0], e.dataTransfer.files[1]);
-            } else if (e.dataTransfer.files.length === 1) {
-                processFile(e.dataTransfer.files[0]);
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length >= 2) {
+                tempDualFileA = null;
+                processDualFiles(files[0], files[1]);
+            } else if (files.length === 1) {
+                if (!tempDualFileA) {
+                    tempDualFileA = files[0];
+                    alert(`1º Arquivo Recebido: "${tempDualFileA.name}"!\n\nAgora solte ou selecione o 2º arquivo de mês fechado para comparar.`);
+                } else {
+                    const fileB = files[0];
+                    const fileA = tempDualFileA;
+                    tempDualFileA = null;
+                    processDualFiles(fileA, fileB);
+                }
             }
         }
     });
