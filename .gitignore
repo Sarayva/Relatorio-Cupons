@@ -1,0 +1,15 @@
+# Python / Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Planilhas de Dados (Sensíveis / Relatórios)
+*.xls
+*.xlsx
+
+# Arquivos de Sistema / VSCode
+.DS_Store
+Thumbs.db
