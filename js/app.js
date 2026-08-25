@@ -152,19 +152,40 @@ function initDragAndDrop() {
 
 function parseExcelRecords(sheetData) {
     let headerIdx = -1;
+
+    // Busca a linha que tem pelo menos 3 celulas preenchidas E contem nomes de colunas
     for (let i = 0; i < Math.min(sheetData.length, 30); i++) {
-        const rowStr = JSON.stringify(sheetData[i] || []).toUpperCase();
-        if (rowStr.includes("VENDEDOR") || rowStr.includes("CATEGOR") || rowStr.includes("CUPOM") || rowStr.includes("FILIAL") || rowStr.includes("LOJA") || rowStr.includes("NVR")) {
+        const row = sheetData[i];
+        if (!row || !Array.isArray(row)) continue;
+
+        const filledCells = row.filter(c => c !== undefined && c !== null && String(c).trim() !== '');
+        if (filledCells.length < 3) continue; // Pula titulos e celulas mescladas unicas
+
+        const rowStr = JSON.stringify(row).toUpperCase();
+        if (
+            rowStr.includes("CUPOM") || 
+            rowStr.includes("VENDEDOR") || 
+            rowStr.includes("CATEGOR") || 
+            rowStr.includes("FILIAL") || 
+            rowStr.includes("LOJA") || 
+            rowStr.includes("NVR") ||
+            rowStr.includes("VENDA") ||
+            rowStr.includes("DESCONTO")
+        ) {
             headerIdx = i;
             break;
         }
     }
 
     if (headerIdx === -1) {
-        for (let i = 0; i < Math.min(sheetData.length, 15); i++) {
-            if (sheetData[i] && sheetData[i].length >= 3) {
-                headerIdx = i;
-                break;
+        for (let i = 0; i < Math.min(sheetData.length, 20); i++) {
+            const row = sheetData[i];
+            if (row && Array.isArray(row)) {
+                const filled = row.filter(c => c !== undefined && c !== null && String(c).trim() !== '');
+                if (filled.length >= 3) {
+                    headerIdx = i;
+                    break;
+                }
             }
         }
     }

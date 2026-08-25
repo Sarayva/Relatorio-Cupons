@@ -39,13 +39,13 @@ function getFieldValue(r, fieldType) {
     if (!r) return '';
 
     if (fieldType === 'categoria') {
-        const keys = ['NmCategoria', 'NMCATEGORIA', 'Categoria', 'CATEGORIA', 'DescrCategoria', 'DESCR_CATEGORIA', 'Nome Categoria', 'NomeCategoria', 'Desc Categoria', 'DescCategoria', 'DESCRICAO_CATEGORIA', 'Descrição Categoria', 'DESCRIP_CATEGORIA', 'GRUPO', 'Grupo', 'SUB_CATEGORIA', 'Subcategoria', 'Seção', 'Secao', 'DEPARTAMENTO', 'Departamento'];
-        for (let k of keys) {
+        const exactKeys = ['NmCategoria', 'NMCATEGORIA', 'Categoria', 'CATEGORIA', 'DescrCategoria', 'DESCR_CATEGORIA', 'Nome Categoria', 'NomeCategoria', 'Desc Categoria', 'DescCategoria', 'DESCRICAO_CATEGORIA', 'Descrição Categoria', 'DESCRIP_CATEGORIA', 'GRUPO', 'Grupo', 'SUB_CATEGORIA', 'Subcategoria', 'Seção', 'Secao', 'DEPARTAMENTO', 'Departamento'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return String(r[k]).trim();
         }
         for (let k in r) {
             let kUpper = k.toUpperCase();
-            if ((kUpper.includes('CATEGOR') || kUpper.includes('GRUPO') || kUpper.includes('DESCR')) && r[k] && String(r[k]).trim() !== '') {
+            if ((kUpper.includes('CATEGOR') || kUpper.includes('GRUPO')) && !kUpper.includes('DESC') && r[k] && String(r[k]).trim() !== '') {
                 return String(r[k]).trim();
             }
         }
@@ -53,8 +53,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'vendedor') {
-        const keys = ['NmVendedor', 'NMVENDEDOR', 'Vendedor', 'VENDEDOR', 'NomeVendedor', 'Nome Vendedor', 'CodVendedor', 'CODVENDEDOR'];
-        for (let k of keys) {
+        const exactKeys = ['NmVendedor', 'NMVENDEDOR', 'Vendedor', 'VENDEDOR', 'NomeVendedor', 'Nome Vendedor', 'CodVendedor', 'CODVENDEDOR'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return String(r[k]).trim();
         }
         for (let k in r) {
@@ -65,8 +65,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'loja') {
-        const keys = ['CodFilial', 'CODFILIAL', 'Filial', 'FILIAL', 'Loja', 'LOJA', 'CodLoja', 'CODLOJA', 'Unidade'];
-        for (let k of keys) {
+        const exactKeys = ['CodFilial', 'CODFILIAL', 'Filial', 'FILIAL', 'Loja', 'LOJA', 'CodLoja', 'CODLOJA', 'Unidade'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
@@ -77,8 +77,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'cupom') {
-        const keys = ['NrCupom', 'NRCUPOM', 'Cupom', 'CUPOM', 'NumCupom', 'Número Cupom', 'NumeroCupom', 'COD_CUPOM'];
-        for (let k of keys) {
+        const exactKeys = ['NrCupom', 'NRCUPOM', 'Cupom', 'CUPOM', 'NumCupom', 'Número Cupom', 'NumeroCupom', 'COD_CUPOM', 'NRO_CUPOM'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return String(r[k]).trim();
         }
         for (let k in r) {
@@ -89,8 +89,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'data') {
-        const keys = ['DataVenda', 'DATAVENDA', 'Data', 'DATA', 'DataEmissao', 'Data Venda', 'DATA_VENDA'];
-        for (let k of keys) {
+        const exactKeys = ['DataVenda', 'DATAVENDA', 'Data', 'DATA', 'DataEmissao', 'Data Venda', 'DATA_VENDA'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
@@ -101,8 +101,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'venda') {
-        const keys = ['VlrVenda', 'VLRVENDA', 'Venda', 'VENDA', 'ValorVenda', 'Valor Venda', 'TotalVenda', 'VLR_VENDA'];
-        for (let k of keys) {
+        const exactKeys = ['VlrVenda', 'VLRVENDA', 'Venda', 'VENDA', 'ValorVenda', 'Valor Venda', 'TotalVenda', 'VLR_VENDA'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
@@ -113,8 +113,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'desconto') {
-        const keys = ['VlrDescItens', 'VLRDESCITENS', 'Desconto', 'DESCONTO', 'ValorDesconto', 'Valor Desconto', 'VlrDesconto', 'VLR_DESCONTO'];
-        for (let k of keys) {
+        const exactKeys = ['VlrDescItens', 'VLRDESCITENS', 'Desconto', 'DESCONTO', 'ValorDesconto', 'Valor Desconto', 'VlrDesconto', 'VLR_DESCONTO'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
@@ -125,8 +125,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'margem') {
-        const keys = ['VlrMargemBruta', 'VLRMARGEMBRUTA', 'Margem', 'MARGEM', 'ValorMargem', 'Valor Margem', 'MargemBruta', 'MARGEM_BRUTA'];
-        for (let k of keys) {
+        const exactKeys = ['VlrMargemBruta', 'VLRMARGEMBRUTA', 'Margem', 'MARGEM', 'ValorMargem', 'Valor Margem', 'MargemBruta', 'MARGEM_BRUTA'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
@@ -137,8 +137,8 @@ function getFieldValue(r, fieldType) {
     }
 
     if (fieldType === 'pct') {
-        const keys = ['%DescontoFinal', '%DESCONTOFINAL', '%Desconto', '% Desconto', 'PctDesconto', 'PERC_DESCONTO'];
-        for (let k of keys) {
+        const exactKeys = ['%DescontoFinal', '%DESCONTOFINAL', '%Desconto', '% Desconto', 'PctDesconto', 'PERC_DESCONTO'];
+        for (let k of exactKeys) {
             if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return r[k];
         }
         for (let k in r) {
