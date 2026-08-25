@@ -1251,45 +1251,81 @@ async function exportarExcelProfissional() {
 
 
         // ==========================================
-        // 6. ABA GRÁFICOS (RENDERIZADOS COMO IMAGEM PNG ALTA RESOLUÇÃO)
+        // 6. ABA GRÁFICOS (LAYOUT EM 2 COLUNAS CONFORME DESIGN DA IMAGEM)
         // ==========================================
-        const wsGraficos = workbook.addWorksheet('Gráficos');
+        const wsGraficos = workbook.addWorksheet('Gráficos', { views: [{ showGridLines: true }] });
         
-        const chartList = [
-            { id: 'chartLojas', title: '1. Ranking de Cupons por Loja' },
-            { id: 'chartVend', title: '2. Top Vendedores com Mais Cupons' },
-            { id: 'chartCat', title: '3. Distribuição por Categoria de Produto' },
-            { id: 'chartLinhas', title: '4. Distribuição por Linha de Medicamentos' },
-            { id: 'chartDias', title: '5. Média de Cupons por Dia da Semana' },
-            { id: 'chartFin', title: '6. Análise Financeira: Vendido vs Margem vs Desconto' }
+        const getExportableChartImage = (canvas) => {
+            if (!canvas) return null;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const ctx = tempCanvas.getContext('2d');
+            
+            // Fundo escuro idêntico ao do dashboard (#181818)
+            ctx.fillStyle = isDarkTheme ? '#181818' : '#ffffff';
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            ctx.drawImage(canvas, 0, 0);
+            return tempCanvas.toDataURL('image/png');
+        };
+
+        const chartPairs = [
+            [
+                { id: 'chartLojas', title: '1. Ranking de Cupons por Loja' },
+                { id: 'chartVend', title: '2. Top Vendedores com Mais Cupons' }
+            ],
+            [
+                { id: 'chartCat', title: '3. Distribuição por Categoria de Produto' },
+                { id: 'chartLinhas', title: '4. Distribuição por Linha de Medicamentos' }
+            ],
+            [
+                { id: 'chartDias', title: '5. Média de Cupons por Dia da Semana' },
+                { id: 'chartFin', title: '6. Análise Financeira: Vendido vs Margem vs Desconto' }
+            ]
         ];
 
-        let currRow = 1;
+        let startRow = 1;
 
-        for (const c of chartList) {
-            const canvas = document.getElementById(c.id);
-            if (canvas) {
-                wsGraficos.mergeCells(`A${currRow}:H${currRow}`);
-                const titleCell = wsGraficos.getCell(`A${currRow}`);
-                titleCell.value = c.title;
-                titleCell.font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FF1F1F1F' } };
-                titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F4F4' } };
-                titleCell.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
-                wsGraficos.getRow(currRow).height = 26;
+        for (const pair of chartPairs) {
+            const leftChart = pair[0];
+            const rightChart = pair[1];
 
-                const imgData = canvas.toDataURL('image/png');
-                const imageId = workbook.addImage({
-                    base64: imgData,
-                    extension: 'png'
-                });
-
-                wsGraficos.addImage(imageId, {
-                    tl: { col: 0, row: currRow }, // Linha base 0 (abaixo do título)
-                    ext: { width: 750, height: 380 }
-                });
-
-                currRow += 21;
+            // Gráfico da Esquerda (Coluna A)
+            if (leftChart) {
+                const cellL = wsGraficos.getCell(`A${startRow}`);
+                cellL.value = leftChart.title;
+                cellL.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
+                
+                const canvasL = document.getElementById(leftChart.id);
+                if (canvasL) {
+                    const imgDataL = getExportableChartImage(canvasL);
+                    const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
+                    wsGraficos.addImage(imageIdL, {
+                        tl: { col: 0, row: startRow }, // Coluna A (col: 0), Linha startRow
+                        ext: { width: 590, height: 320 }
+                    });
+                }
             }
+
+            // Gráfico da Direita (Coluna O)
+            if (rightChart) {
+                const cellR = wsGraficos.getCell(`O${startRow}`);
+                cellR.value = rightChart.title;
+                cellR.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
+
+                const canvasR = document.getElementById(rightChart.id);
+                if (canvasR) {
+                    const imgDataR = getExportableChartImage(canvasR);
+                    const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
+                    wsGraficos.addImage(imageIdR, {
+                        tl: { col: 14, row: startRow }, // Coluna O (col: 14), Linha startRow
+                        ext: { width: 590, height: 320 }
+                    });
+                }
+            }
+
+            wsGraficos.getRow(startRow).height = 20;
+            startRow += 19; // Avança 19 linhas (1 título + ~17 altura imagem + 1 espaço)
         }
 
         // ==========================================
