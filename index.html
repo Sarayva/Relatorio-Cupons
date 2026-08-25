@@ -605,6 +605,130 @@
             width: 100%;
         }
 
+        /* --- COMPARATIVO SEMANAL STYLES --- */
+        .view-mode-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--header-bg);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .view-mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-tab:hover {
+            background: var(--card-bg-hover);
+            color: var(--text-main);
+        }
+
+        .view-tab.active {
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .comparison-selectors {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .week-select {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.45rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .delta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 0.4rem;
+        }
+
+        .delta-badge.red {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .delta-badge.green {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .delta-badge.neutral {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.3);
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        .comp-table th, .comp-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comp-table th {
+            background: var(--header-bg);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -683,81 +807,166 @@
             </div>
         </header>
 
+        <!-- NAVEGAÇÃO DE MODO: VISÃO GERAL vs COMPARATIVO SEMANAL -->
+        <div id="view-mode-bar" class="view-mode-bar hidden">
+            <div class="view-mode-tabs">
+                <button id="tab-overview" class="view-tab active">📊 Visão Geral</button>
+                <button id="tab-comparison" class="view-tab">📈 Comparativo Semanal <span class="tab-badge">Novo</span></button>
+            </div>
+            <div id="comparison-selectors" class="comparison-selectors hidden">
+                <span>Períodos:</span>
+                <select id="select-week-base" class="week-select"></select>
+                <span>vs</span>
+                <select id="select-week-target" class="week-select"></select>
+            </div>
+        </div>
+
         <div id="loader">
             <div class="spinner"></div>
             <p style="color: var(--text-muted); font-size: 1.05rem;">Processando planilha e gerando estatísticas...</p>
         </div>
 
         <main id="dashboard" class="hidden">
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3>Cupons Únicos</h3>
-                    <p id="kpi-cupons">0</p>
-                </div>
-                <div class="kpi-card">
-                    <h3>Lojas / Vendedores</h3>
-                    <p id="kpi-lojas-vend">0 / 0</p>
-                </div>
-                <div class="kpi-card">
-                    <h3>Total Vendido</h3>
-                    <p id="kpi-vendido">R$ 0</p>
-                </div>
-                <div class="kpi-card">
-                    <h3>Total Desconto</h3>
-                    <div class="flex-between">
-                        <p id="kpi-desconto" style="color:var(--color-red)">R$ 0</p>
-                        <span id="kpi-pct-desc" style="color:var(--color-red)">0%</span>
+            <!-- VISÃO GERAL (PADRÃO) -->
+            <div id="overview-view">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <h3>Cupons Únicos</h3>
+                        <p id="kpi-cupons">0</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Lojas / Vendedores</h3>
+                        <p id="kpi-lojas-vend">0 / 0</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total Vendido</h3>
+                        <p id="kpi-vendido">R$ 0</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total Desconto</h3>
+                        <div class="flex-between">
+                            <p id="kpi-desconto" style="color:var(--color-red)">R$ 0</p>
+                            <span id="kpi-pct-desc" style="color:var(--color-red)">0%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Margem</h3>
+                        <p id="kpi-margem" style="color:var(--color-green)">R$ 0</p>
                     </div>
                 </div>
-                <div class="kpi-card">
-                    <h3>Margem</h3>
-                    <p id="kpi-margem" style="color:var(--color-green)">R$ 0</p>
+
+                <div id="summary-container" class="summary-card">
+                    <div class="summary-header">
+                        <div class="summary-title-group">
+                            <h2>📝 Resumo Executivo Gerencial</h2>
+                            <span class="summary-badge">Pontos Principais do Relatório</span>
+                        </div>
+                        <button id="btn-copy-summary" class="btn-copy-summary"
+                            title="Copiar resumo formatado para área de transferência">
+                            <span>📋</span> Copiar Resumo
+                        </button>
+                    </div>
+                    <div id="summary-content">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Importe uma planilha para visualizar o
+                            resumo executivo automático dos dados.</p>
+                    </div>
+                </div>
+
+                <div id="alert-container"></div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">⚠ Top Lojas com Cupons (Menos = Melhor)</div>
+                        <div class="canvas-wrapper"><canvas id="chartLojas"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">⚠ Top Vendedores com Cupons</div>
+                        <div class="canvas-wrapper"><canvas id="chartVend"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">Top Categorias</div>
+                        <div class="canvas-wrapper"><canvas id="chartCat"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">Cupons por Linha de Produto</div>
+                        <div class="canvas-wrapper"><canvas id="chartLinhas"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">Média por Dia da Semana</div>
+                        <div class="canvas-wrapper"><canvas id="chartDias"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">Financeiro: Vendido x Margem x Desconto (Top 8)</div>
+                        <div class="canvas-wrapper"><canvas id="chartFin"></canvas></div>
+                    </div>
                 </div>
             </div>
 
-            <div id="summary-container" class="summary-card">
-                <div class="summary-header">
-                    <div class="summary-title-group">
-                        <h2>📝 Resumo Executivo Gerencial</h2>
-                        <span class="summary-badge">Pontos Principais do Relatório</span>
+            <!-- VISÃO COMPARATIVA SEMANAL -->
+            <div id="comparison-view" class="hidden">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <h3>Cupons Emitidos (Δ%)</h3>
+                        <p id="comp-kpi-cupons">0 ➔ 0</p>
+                        <div id="comp-badge-cupons" class="delta-badge neutral">0%</div>
                     </div>
-                    <button id="btn-copy-summary" class="btn-copy-summary"
-                        title="Copiar resumo formatado para área de transferência">
-                        <span>📋</span> Copiar Resumo
-                    </button>
+                    <div class="kpi-card">
+                        <h3>Total Vendido Bruto (Δ%)</h3>
+                        <p id="comp-kpi-vendido">R$ 0 ➔ R$ 0</p>
+                        <div id="comp-badge-vendido" class="delta-badge neutral">0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>Total em Descontos (Δ%)</h3>
+                        <p id="comp-kpi-desconto">R$ 0 ➔ R$ 0</p>
+                        <div id="comp-badge-desconto" class="delta-badge neutral">0%</div>
+                    </div>
                 </div>
-                <div id="summary-content">
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Importe uma planilha para visualizar o
-                        resumo executivo automático dos dados.</p>
-                </div>
-            </div>
 
-            <div id="alert-container"></div>
+                <div class="charts-grid" style="margin-top: 1.5rem;">
+                    <div class="chart-card">
+                        <div class="chart-header">📊 Cupons por Loja (Comparativo Semanal)</div>
+                        <div class="canvas-wrapper"><canvas id="chartCompLojas"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">📊 Cupons por Vendedor (Comparativo Semanal)</div>
+                        <div class="canvas-wrapper"><canvas id="chartCompVend"></canvas></div>
+                    </div>
+                </div>
 
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-header">⚠ Top Lojas com Cupons (Menos = Melhor)</div>
-                    <div class="canvas-wrapper"><canvas id="chartLojas"></canvas></div>
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <div class="chart-header">📋 Tabela Comparativa de Lojas</div>
+                    <div style="overflow-x: auto;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>Loja / Unidade</th>
+                                    <th id="th-sem-base-loja">Semana 1</th>
+                                    <th id="th-sem-target-loja">Semana 2</th>
+                                    <th>Variação (Δ%)</th>
+                                    <th>Status de Desempenho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-comp-lojas"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="chart-card">
-                    <div class="chart-header">⚠ Top Vendedores com Cupons</div>
-                    <div class="canvas-wrapper"><canvas id="chartVend"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">Top Categorias</div>
-                    <div class="canvas-wrapper"><canvas id="chartCat"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">Cupons por Linha de Produto</div>
-                    <div class="canvas-wrapper"><canvas id="chartLinhas"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">Média por Dia da Semana</div>
-                    <div class="canvas-wrapper"><canvas id="chartDias"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">Financeiro: Vendido x Margem x Desconto (Top 8)</div>
-                    <div class="canvas-wrapper"><canvas id="chartFin"></canvas></div>
+
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <div class="chart-header">📋 Tabela Comparativa de Vendedores</div>
+                    <div style="overflow-x: auto;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <th id="th-sem-base-vend">Semana 1</th>
+                                    <th id="th-sem-target-vend">Semana 2</th>
+                                    <th>Variação (Δ%)</th>
+                                    <th>Status de Desempenho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-comp-vendedores"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
@@ -805,9 +1014,255 @@
             headerBrand.addEventListener('click', () => {
                 document.getElementById('dash-header').classList.add('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('view-mode-bar').classList.add('hidden');
                 document.getElementById('hero-screen').style.display = 'flex';
                 document.getElementById('file-input').value = '';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // --- MÓDULO DE COMPARATIVO SEMANAL ---
+        let GLOBAL_SEMANAS_MAP = {};
+
+        function getWeekInterval(dateStr) {
+            if (!dateStr) return null;
+            let str = (dateStr + "").trim().split(" ")[0];
+            let parts = str.split('/');
+            let d;
+            if (parts.length === 3) {
+                d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            } else {
+                parts = str.split('-');
+                if (parts.length === 3) {
+                    d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                }
+            }
+            if (!d || isNaN(d.getTime())) return null;
+
+            let day = d.getDay();
+            let diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+            let monday = new Date(d.getFullYear(), d.getMonth(), diffToMonday);
+
+            let sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const fmt = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
+            return `${fmt(monday)} a ${fmt(sunday)}`;
+        }
+
+        function agruparPorSemanas(records) {
+            const semanasMap = {};
+
+            records.forEach(r => {
+                let intervalo = getWeekInterval(r.DataVenda);
+                if (!intervalo) return;
+
+                if (!semanasMap[intervalo]) {
+                    semanasMap[intervalo] = {
+                        intervalo: intervalo,
+                        cupons: new Set(),
+                        lojas: {},
+                        vendedores: {},
+                        vendaTotal: 0,
+                        descontoTotal: 0
+                    };
+                }
+
+                let sem = semanasMap[intervalo];
+                let nr = r.NrCupom;
+                if (nr) sem.cupons.add(nr);
+
+                let codF = parseInt(r.CodFilial);
+                let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${r.CodFilial}`;
+                let vend = r.NmVendedor || 'N/A';
+
+                if (!sem.lojas[loja]) sem.lojas[loja] = new Set();
+                if (nr) sem.lojas[loja].add(nr);
+
+                if (!sem.vendedores[vend]) sem.vendedores[vend] = new Set();
+                if (nr) sem.vendedores[vend].add(nr);
+
+                let vVenda = parseFloat(String(r.VlrVenda || 0).replace(',', '.'));
+                let vDesc = parseFloat(String(r.VlrDescItens || 0).replace(',', '.'));
+                if (!isNaN(vVenda)) sem.vendaTotal += vVenda;
+                if (!isNaN(vDesc)) sem.descontoTotal += vDesc;
+            });
+
+            return semanasMap;
+        }
+
+        function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
+            const semA = semanasMap[semKeyA];
+            const semB = semanasMap[semKeyB];
+
+            if (!semA || !semB) return null;
+
+            const calcDelta = (valA, valB) => {
+                if (valA === 0) return valB > 0 ? 100 : 0;
+                return ((valB - valA) / valA) * 100;
+            };
+
+            let qteA = semA.cupons.size;
+            let qteB = semB.cupons.size;
+            let deltaCupons = calcDelta(qteA, qteB);
+
+            let vA = semA.vendaTotal;
+            let vB = semB.vendaTotal;
+            let deltaVenda = calcDelta(vA, vB);
+
+            let dA = semA.descontoTotal;
+            let dB = semB.descontoTotal;
+            let deltaDesconto = calcDelta(dA, dB);
+
+            // Lojas Comparadas
+            const todasLojas = new Set([...Object.keys(semA.lojas), ...Object.keys(semB.lojas)]);
+            const comparativoLojas = [];
+
+            todasLojas.forEach(loja => {
+                let cA = semA.lojas[loja] ? semA.lojas[loja].size : 0;
+                let cB = semB.lojas[loja] ? semB.lojas[loja].size : 0;
+                let delta = calcDelta(cA, cB);
+                let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
+                let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
+                comparativoLojas.push({ loja, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+            });
+
+            comparativoLojas.sort((a, b) => b.cB - a.cB);
+
+            // Vendedores Comparados
+            const todosVends = new Set([...Object.keys(semA.vendedores), ...Object.keys(semB.vendedores)]);
+            const comparativoVendedores = [];
+
+            todosVends.forEach(vend => {
+                let cA = semA.vendedores[vend] ? semA.vendedores[vend].size : 0;
+                let cB = semB.vendedores[vend] ? semB.vendedores[vend].size : 0;
+                let delta = calcDelta(cA, cB);
+                let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
+                let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
+                comparativoVendedores.push({ vend, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+            });
+
+            comparativoVendedores.sort((a, b) => b.cB - a.cB);
+
+            return {
+                semanaBase: semKeyA,
+                semanaComparada: semKeyB,
+                geral: {
+                    cuponsA: qteA,
+                    cuponsB: qteB,
+                    deltaCupons: deltaCupons,
+                    vendaA: vA,
+                    vendaB: vB,
+                    deltaVenda: deltaVenda,
+                    descontoA: dA,
+                    descontoB: dB,
+                    deltaDesconto: deltaDesconto
+                },
+                lojas: comparativoLojas,
+                vendedores: comparativoVendedores
+            };
+        }
+
+        function renderComparativoDashboard(compRes) {
+            if (!compRes) return;
+
+            document.getElementById('comp-kpi-cupons').innerText = `${compRes.geral.cuponsA.toLocaleString('pt-BR')} ➔ ${compRes.geral.cuponsB.toLocaleString('pt-BR')}`;
+            const badgeC = document.getElementById('comp-badge-cupons');
+            let dC = compRes.geral.deltaCupons;
+            badgeC.innerText = (dC > 0 ? '+' : '') + dC.toFixed(1) + '%';
+            badgeC.className = 'delta-badge ' + (dC > 0 ? 'red' : dC < 0 ? 'green' : 'neutral');
+
+            document.getElementById('comp-kpi-vendido').innerText = `R$ ${(compRes.geral.vendaA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.vendaB / 1000).toFixed(1)}k`;
+            const badgeV = document.getElementById('comp-badge-vendido');
+            let dV = compRes.geral.deltaVenda;
+            badgeV.innerText = (dV > 0 ? '+' : '') + dV.toFixed(1) + '%';
+            badgeV.className = 'delta-badge ' + (dV > 0 ? 'green' : dV < 0 ? 'red' : 'neutral');
+
+            document.getElementById('comp-kpi-desconto').innerText = `R$ ${(compRes.geral.descontoA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.descontoB / 1000).toFixed(1)}k`;
+            const badgeD = document.getElementById('comp-badge-desconto');
+            let dD = compRes.geral.deltaDesconto;
+            badgeD.innerText = (dD > 0 ? '+' : '') + dD.toFixed(1) + '%';
+            badgeD.className = 'delta-badge ' + (dD > 0 ? 'red' : dD < 0 ? 'green' : 'neutral');
+
+            document.getElementById('th-sem-base-loja').innerText = compRes.semanaBase;
+            document.getElementById('th-sem-target-loja').innerText = compRes.semanaComparada;
+            document.getElementById('th-sem-base-vend').innerText = compRes.semanaBase;
+            document.getElementById('th-sem-target-vend').innerText = compRes.semanaComparada;
+
+            const tbodyLojas = document.getElementById('tbody-comp-lojas');
+            tbodyLojas.innerHTML = compRes.lojas.slice(0, 15).map(l => `
+                <tr>
+                    <td><strong>${l.loja}</strong></td>
+                    <td>${l.cA.toLocaleString('pt-BR')} cupons</td>
+                    <td>${l.cB.toLocaleString('pt-BR')} cupons</td>
+                    <td><span class="delta-badge ${l.statusClass}">${l.deltaStr}</span></td>
+                    <td>${l.statusLabel}</td>
+                </tr>
+            `).join('');
+
+            const tbodyVend = document.getElementById('tbody-comp-vendedores');
+            tbodyVend.innerHTML = compRes.vendedores.slice(0, 15).map(v => `
+                <tr>
+                    <td><strong>${v.vend}</strong></td>
+                    <td>${v.cA.toLocaleString('pt-BR')} cupons</td>
+                    <td>${v.cB.toLocaleString('pt-BR')} cupons</td>
+                    <td><span class="delta-badge ${v.statusClass}">${v.deltaStr}</span></td>
+                    <td>${v.statusLabel}</td>
+                </tr>
+            `).join('');
+
+            const top10Lojas = compRes.lojas.slice(0, 10);
+            drawDoubleBarChart('chartCompLojas',
+                top10Lojas.map(l => l.loja.replace(/^\d+\s*-\s*/, '')),
+                compRes.semanaBase, top10Lojas.map(l => l.cA),
+                compRes.semanaComparada, top10Lojas.map(l => l.cB)
+            );
+
+            const top10Vend = compRes.vendedores.slice(0, 10);
+            drawDoubleBarChart('chartCompVend',
+                top10Vend.map(v => v.vend),
+                compRes.semanaBase, top10Vend.map(v => v.cA),
+                compRes.semanaComparada, top10Vend.map(v => v.cB)
+            );
+        }
+
+        function drawDoubleBarChart(ctxId, labels, labelA, dataA, labelB, dataB) {
+            if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
+
+            const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
+            const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+
+            chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: labelA,
+                            data: dataA,
+                            backgroundColor: '#378ADD',
+                            borderRadius: 4
+                        },
+                        {
+                            label: labelB,
+                            data: dataB,
+                            backgroundColor: '#C0392B',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: textColor } },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor } }
+                    }
+                }
             });
         }
 
@@ -986,10 +1441,46 @@
             if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
         });
 
+        // --- ALTERNÂNCIA DE ABAS DE NAVEGAÇÃO ---
+        const tabOverview = document.getElementById('tab-overview');
+        const tabComparison = document.getElementById('tab-comparison');
+        const overviewView = document.getElementById('overview-view');
+        const comparisonView = document.getElementById('comparison-view');
+
+        tabOverview.addEventListener('click', () => {
+            tabOverview.classList.add('active');
+            tabComparison.classList.remove('active');
+            overviewView.classList.remove('hidden');
+            comparisonView.classList.add('hidden');
+        });
+
+        tabComparison.addEventListener('click', () => {
+            tabComparison.classList.add('active');
+            tabOverview.classList.remove('active');
+            comparisonView.classList.remove('hidden');
+            overviewView.classList.add('hidden');
+        });
+
+        const selectBase = document.getElementById('select-week-base');
+        const selectTarget = document.getElementById('select-week-target');
+
+        const onWeekSelectChange = () => {
+            let semA = selectBase.value;
+            let semB = selectTarget.value;
+            if (semA && semB && GLOBAL_SEMANAS_MAP) {
+                const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, semA, semB);
+                renderComparativoDashboard(compRes);
+            }
+        };
+
+        selectBase.addEventListener('change', onWeekSelectChange);
+        selectTarget.addEventListener('change', onWeekSelectChange);
+
         function processFile(file) {
             heroScreen.style.display = 'none';
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('dash-header').classList.add('hidden');
+            document.getElementById('view-mode-bar').classList.add('hidden');
             document.getElementById('loader').style.display = 'block';
 
             const reader = new FileReader();
@@ -1027,6 +1518,30 @@
 
                     GLOBAL_RECORDS = records;
                     calcularDashboard(records);
+
+                    // Inicialização do Módulo Comparativo
+                    GLOBAL_SEMANAS_MAP = agruparPorSemanas(records);
+                    const listaSemanas = Object.keys(GLOBAL_SEMANAS_MAP);
+                    const viewModeBar = document.getElementById('view-mode-bar');
+                    const compSelectors = document.getElementById('comparison-selectors');
+
+                    if (listaSemanas.length > 1) {
+                        viewModeBar.classList.remove('hidden');
+                        compSelectors.classList.remove('hidden');
+
+                        selectBase.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
+                        selectTarget.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
+
+                        selectBase.value = listaSemanas[listaSemanas.length - 2];
+                        selectTarget.value = listaSemanas[listaSemanas.length - 1];
+
+                        const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
+                        renderComparativoDashboard(compRes);
+                    } else {
+                        viewModeBar.classList.add('hidden');
+                        compSelectors.classList.add('hidden');
+                        tabOverview.click();
+                    }
 
                     document.getElementById('loader').style.display = 'none';
                     document.getElementById('dash-header').classList.remove('hidden');
@@ -1643,9 +2158,48 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
                 applyZebraAndBorders(wsDia, 2);
                 autoFitColumns(wsDia);
 
+                // ==========================================
+                // 6. ABA COMPARATIVO SEMANAL (SE HOUVER > 1 SEMANA)
+                // ==========================================
+                const listaSemanasExp = Object.keys(GLOBAL_SEMANAS_MAP);
+                if (listaSemanasExp.length > 1) {
+                    const wsComp = workbook.addWorksheet('Comparativo Semanal', { views: [{ state: 'frozen', ySplit: 1 }] });
+                    const semA = selectBase.value || listaSemanasExp[listaSemanasExp.length - 2];
+                    const semB = selectTarget.value || listaSemanasExp[listaSemanasExp.length - 1];
+                    const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, semA, semB);
+
+                    if (compRes) {
+                        const hComp = wsComp.addRow(['Loja / Unidade', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho']);
+                        formatHeaderRow(hComp);
+
+                        compRes.lojas.forEach(l => {
+                            let statusBg = l.deltaNum > 0 ? 'FFFADBD8' : l.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
+                            let statusFg = l.deltaNum > 0 ? 'FFC0392B' : l.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
+
+                            const row = wsComp.addRow([l.loja, l.cA, l.cB, l.deltaNum / 100, l.statusLabel]);
+                            row.getCell(2).numFmt = '#,##0';
+                            row.getCell(3).numFmt = '#,##0';
+                            row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
+
+                            const cellVar = row.getCell(4);
+                            const cellSt = row.getCell(5);
+
+                            cellVar.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                            cellVar.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+
+                            cellSt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                            cellSt.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                            cellSt.alignment = { horizontal: 'center' };
+                        });
+
+                        applyZebraAndBorders(wsComp, 2);
+                        autoFitColumns(wsComp);
+                    }
+                }
+
 
                 // ==========================================
-                // 6. ABA GRÁFICOS (LAYOUT EM 2 COLUNAS CONFORME DESIGN DA IMAGEM)
+                // 7. ABA GRÁFICOS (LAYOUT EM 2 COLUNAS CONFORME DESIGN DA IMAGEM)
                 // ==========================================
                 const wsGraficos = workbook.addWorksheet('Gráficos', { views: [{ showGridLines: true }] });
 
@@ -1731,10 +2285,6 @@ Priorizar auditoria operacional focada na unidade *${topLoja.nome}* e acompanhar
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = `relatorio semana ${semanaId}.xlsx`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-                link.href = URL.createObjectURL(blob);
-                link.download = `relatorio da semana ${semanaId}.xlsx`;
                 link.click();
                 URL.revokeObjectURL(link.href);
 
