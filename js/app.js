@@ -7,10 +7,6 @@ let GLOBAL_RECORDS = [];
 let GLOBAL_EXPORT_DATA = {};
 let chartsObj = {};
 
-// Arquivos para o modo dual (Análises Mensais)
-let dualFileA = null;
-let dualFileB = null;
-
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family = "'Inter', sans-serif";
 
@@ -19,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBrandHomeNav();
     initTabSwitching();
     initFileInputs();
+    initDragAndDrop();
 });
 
 function initThemeToggle() {
@@ -65,14 +62,9 @@ function initBrandHomeNav() {
             document.getElementById('hero-screen').style.display = 'flex';
             
             const fileInput = document.getElementById('file-input');
+            const fileInputDual = document.getElementById('file-input-dual');
             if (fileInput) fileInput.value = '';
-            
-            const fileMonthA = document.getElementById('file-month-a');
-            const fileMonthB = document.getElementById('file-month-b');
-            if (fileMonthA) fileMonthA.value = '';
-            if (fileMonthB) fileMonthB.value = '';
-            dualFileA = null;
-            dualFileB = null;
+            if (fileInputDual) fileInputDual.value = '';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -113,34 +105,13 @@ function initFileInputs() {
         });
     }
 
-    const fileMonthA = document.getElementById('file-month-a');
-    const fileMonthB = document.getElementById('file-month-b');
-    const btnProcessDual = document.getElementById('btn-process-dual');
-
-    if (fileMonthA) {
-        fileMonthA.addEventListener('change', e => {
-            if (e.target.files.length) dualFileA = e.target.files[0];
-            checkDualReady();
-        });
-    }
-
-    if (fileMonthB) {
-        fileMonthB.addEventListener('change', e => {
-            if (e.target.files.length) dualFileB = e.target.files[0];
-            checkDualReady();
-        });
-    }
-
-    function checkDualReady() {
-        if (btnProcessDual) {
-            btnProcessDual.disabled = !(dualFileA && dualFileB);
-        }
-    }
-
-    if (btnProcessDual) {
-        btnProcessDual.addEventListener('click', () => {
-            if (dualFileA && dualFileB) {
-                processDualFiles(dualFileA, dualFileB);
+    const fileInputDual = document.getElementById('file-input-dual');
+    if (fileInputDual) {
+        fileInputDual.addEventListener('change', e => {
+            if (e.target.files.length >= 2) {
+                processDualFiles(e.target.files[0], e.target.files[1]);
+            } else if (e.target.files.length === 1) {
+                alert('Por favor, selecione 2 arquivos de meses fechados para realizar o comparativo mensal.');
             }
         });
     }
@@ -149,6 +120,34 @@ function initFileInputs() {
     if (btnExport) {
         btnExport.addEventListener('click', exportarExcelProfissional);
     }
+}
+
+function initDragAndDrop() {
+    const heroScreen = document.getElementById('hero-screen');
+    if (!heroScreen) return;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        window.addEventListener(eventName, e => e.preventDefault());
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        heroScreen.addEventListener(eventName, () => heroScreen.classList.add('dragover'));
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        heroScreen.addEventListener(eventName, () => heroScreen.classList.remove('dragover'));
+    });
+
+    window.addEventListener('drop', e => {
+        e.preventDefault();
+        if (e.dataTransfer && e.dataTransfer.files) {
+            if (e.dataTransfer.files.length >= 2) {
+                processDualFiles(e.dataTransfer.files[0], e.dataTransfer.files[1]);
+            } else if (e.dataTransfer.files.length === 1) {
+                processFile(e.dataTransfer.files[0]);
+            }
+        }
+    });
 }
 
 function parseExcelRecords(sheetData) {

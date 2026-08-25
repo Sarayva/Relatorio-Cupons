@@ -167,7 +167,7 @@
             color: var(--accent);
         }
 
-        /* --- CARDS DE UPLOAD EM VIDRO FOSCO --- */
+        /* --- CARDS DE UPLOAD EM VIDRO FOSCO SIMÉTRICOS --- */
         .hero-upload-cards {
             display: flex;
             gap: 1.5rem;
@@ -175,7 +175,7 @@
             align-items: stretch;
             flex-wrap: wrap;
             margin-top: 0.5rem;
-            max-width: 900px;
+            max-width: 880px;
             width: 100%;
         }
 
@@ -185,14 +185,15 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
-            padding: 1.75rem;
-            flex: 1 1 350px;
+            padding: 2rem;
+            flex: 1 1 360px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             transition: all 0.3s ease;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            min-height: 220px;
         }
 
         body.light-theme .upload-glass-card {
@@ -203,11 +204,19 @@
 
         .upload-glass-card:hover {
             border-color: var(--accent);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+        }
+
+        .glass-card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
         }
 
         .glass-card-title {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: var(--text-main);
@@ -217,11 +226,11 @@
         }
 
         .glass-card-desc {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
             text-align: center;
-            margin-bottom: 1.25rem;
-            line-height: 1.4;
+            margin-bottom: 1.5rem;
+            line-height: 1.45;
         }
 
         .btn-hero-import {
@@ -231,9 +240,9 @@
             gap: 0.75rem;
             background: var(--accent-bg);
             color: #ffffff;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
-            padding: 0.85rem 2rem;
+            padding: 0.85rem 1.8rem;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(0, 120, 212, 0.35);
@@ -247,59 +256,8 @@
             box-shadow: 0 8px 24px rgba(0, 120, 212, 0.45);
         }
 
-        .dual-file-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .btn-dual-select {
-            background: var(--card-bg);
-            border: 1px dashed var(--border);
-            color: var(--text-muted);
-            padding: 0.6rem 0.85rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .btn-dual-select:hover {
-            border-color: var(--accent);
-            color: var(--text-main);
-        }
-
-        .btn-dual-action {
-            background: var(--accent);
-            color: #ffffff;
-            border: none;
-            padding: 0.75rem 1.2rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
-
-        .btn-dual-action:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .btn-dual-action:not(:disabled):hover {
-            background: var(--accent-hover);
-        }
-
         .hero-drop-hint {
-            margin-top: 1.5rem;
+            margin-top: 1.8rem;
             font-size: 0.9rem;
             color: var(--text-muted);
         }
@@ -766,8 +724,7 @@
 
     <!-- INPUTS DE ARQUIVOS (OCULTOS) -->
     <input type="file" id="file-input" accept=".xls,.xlsx" class="hidden">
-    <input type="file" id="file-month-a" accept=".xls,.xlsx" class="hidden">
-    <input type="file" id="file-month-b" accept=".xls,.xlsx" class="hidden">
+    <input type="file" id="file-input-dual" accept=".xls,.xlsx" multiple class="hidden">
 
     <!-- TELA PRINCIPAL / HERO (DESIGN OFICIAL FARMAPAULO) -->
     <div id="hero-screen">
@@ -788,11 +745,11 @@
                 <span>Decisões que geram resultados.</span>
             </h1>
 
-            <!-- CARDS DE UPLOAD EM VIDRO FOSCO -->
+            <!-- CARDS DE UPLOAD EM VIDRO FOSCO SIMÉTRICOS -->
             <div class="hero-upload-cards">
                 <!-- CARD 1: ANÁLISES SEMANAIS -->
                 <div class="upload-glass-card">
-                    <div>
+                    <div class="glass-card-body">
                         <div class="glass-card-title">📄 Análises Semanais</div>
                         <p class="glass-card-desc">Importe 1 planilha para análise semanal ou de 1 mês completo com várias semanas</p>
                     </div>
@@ -806,19 +763,20 @@
 
                 <!-- CARD 2: ANÁLISES MENSAIS -->
                 <div class="upload-glass-card">
-                    <div>
+                    <div class="glass-card-body">
                         <div class="glass-card-title">📄📄 Análises Mensais</div>
-                        <p class="glass-card-desc">Compare 2 meses fechados importando 2 planilhas distintas</p>
+                        <p class="glass-card-desc">Compare 2 meses fechados importando 2 planilhas distintas simultaneamente</p>
                     </div>
-                    <div class="dual-file-inputs">
-                        <label for="file-month-a" class="btn-dual-select" id="lbl-month-a">📅 1º Arquivo (Mês Base)</label>
-                        <label for="file-month-b" class="btn-dual-select" id="lbl-month-b">📅 2º Arquivo (Mês Alvo)</label>
-                    </div>
-                    <button id="btn-process-dual" class="btn-dual-action" disabled>🔄 Gerar Comparativo Mensal</button>
+                    <label class="btn-hero-import" for="file-input-dual">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        Importar 2 Planilhas
+                    </label>
                 </div>
             </div>
 
-            <p class="hero-drop-hint">Ou arraste e solte a planilha aqui</p>
+            <p class="hero-drop-hint">Ou arraste e solte a(s) planilha(s) aqui</p>
         </div>
     </div>
 
