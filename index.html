@@ -805,7 +805,7 @@
             headerBrand.addEventListener('click', () => {
                 document.getElementById('dash-header').classList.add('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
-                document.getElementById('hero-screen').classList.remove('hidden');
+                document.getElementById('hero-screen').style.display = 'flex';
                 document.getElementById('file-input').value = '';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
