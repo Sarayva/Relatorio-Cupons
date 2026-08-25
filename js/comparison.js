@@ -54,8 +54,13 @@ function agruparPorSemanas(records) {
                 cupons: new Set(),
                 lojas: {},
                 vendedores: {},
+                linhas: {},
+                categorias: {},
                 vendaTotal: 0,
-                descontoTotal: 0
+                descontoTotal: 0,
+                margemTotal: 0,
+                sumPctDesc: 0,
+                countPct: 0
             };
         }
 
@@ -66,6 +71,8 @@ function agruparPorSemanas(records) {
         let codF = parseInt(r.CodFilial);
         let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${r.CodFilial}`;
         let vend = r.NmVendedor || 'N/A';
+        let cat = r.NmCategoria || 'N/A';
+        let linha = classificaLinha(cat);
 
         if (!sem.lojas[loja]) sem.lojas[loja] = new Set();
         if (nr) sem.lojas[loja].add(nr);
@@ -73,10 +80,25 @@ function agruparPorSemanas(records) {
         if (!sem.vendedores[vend]) sem.vendedores[vend] = new Set();
         if (nr) sem.vendedores[vend].add(nr);
 
+        if (!sem.linhas[linha]) sem.linhas[linha] = new Set();
+        if (nr) sem.linhas[linha].add(nr);
+
+        if (!sem.categorias[cat]) sem.categorias[cat] = new Set();
+        if (nr) sem.categorias[cat].add(nr);
+
         let vVenda = parseStrToNum(r.VlrVenda);
         let vDesc = parseStrToNum(r.VlrDescItens);
+        let vMargem = parseStrToNum(r.VlrMargemBruta);
+        let vPct = parseStrToNum(r['%DescontoFinal']);
+
         if (!isNaN(vVenda)) sem.vendaTotal += vVenda;
         if (!isNaN(vDesc)) sem.descontoTotal += vDesc;
+        if (!isNaN(vMargem)) sem.margemTotal += vMargem;
+
+        if (vPct > 0 || r['%DescontoFinal'] != undefined) {
+            sem.sumPctDesc += vPct;
+            sem.countPct++;
+        }
     });
 
     return semanasMap;
@@ -105,9 +127,17 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
     let dB = semB.descontoTotal;
     let deltaDesconto = calcDelta(dA, dB);
 
+    let mA = semA.margemTotal;
+    let mB = semB.margemTotal;
+    let deltaMargem = calcDelta(mA, mB);
+
+    let pctA = semA.countPct ? (semA.sumPctDesc / semA.countPct) : 0;
+    let pctB = semB.countPct ? (semB.sumPctDesc / semB.countPct) : 0;
+    let deltaPctDesc = pctB - pctA; // Variação em pontos percentuais (pp)
+
+    // COMPARATIVO LOJAS
     const todasLojas = new Set([...Object.keys(semA.lojas), ...Object.keys(semB.lojas)]);
     const comparativoLojas = [];
-
     todasLojas.forEach(loja => {
         let cA = semA.lojas[loja] ? semA.lojas[loja].size : 0;
         let cB = semB.lojas[loja] ? semB.lojas[loja].size : 0;
@@ -116,12 +146,11 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
         let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
         comparativoLojas.push({ loja, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
     });
-
     comparativoLojas.sort((a, b) => b.cB - a.cB);
 
+    // COMPARATIVO VENDEDORES
     const todosVends = new Set([...Object.keys(semA.vendedores), ...Object.keys(semB.vendedores)]);
     const comparativoVendedores = [];
-
     todosVends.forEach(vend => {
         let cA = semA.vendedores[vend] ? semA.vendedores[vend].size : 0;
         let cB = semB.vendedores[vend] ? semB.vendedores[vend].size : 0;
@@ -130,31 +159,52 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
         let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
         comparativoVendedores.push({ vend, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
     });
-
     comparativoVendedores.sort((a, b) => b.cB - a.cB);
+
+    // COMPARATIVO LINHAS DE MEDICAMENTO
+    const todasLinhas = new Set([...Object.keys(semA.linhas), ...Object.keys(semB.linhas)]);
+    const comparativoLinhas = [];
+    todasLinhas.forEach(linha => {
+        let cA = semA.linhas[linha] ? semA.linhas[linha].size : 0;
+        let cB = semB.linhas[linha] ? semB.linhas[linha].size : 0;
+        let delta = calcDelta(cA, cB);
+        let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
+        let statusLabel = delta > 0 ? '🔴 Aumento' : delta < 0 ? '🟢 Redução' : '🟡 Estável';
+        comparativoLinhas.push({ linha, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+    });
+    comparativoLinhas.sort((a, b) => b.cB - a.cB);
+
+    // COMPARATIVO CATEGORIAS
+    const todasCats = new Set([...Object.keys(semA.categorias), ...Object.keys(semB.categorias)]);
+    const comparativoCategorias = [];
+    todasCats.forEach(cat => {
+        let cA = semA.categorias[cat] ? semA.categorias[cat].size : 0;
+        let cB = semB.categorias[cat] ? semB.categorias[cat].size : 0;
+        let delta = calcDelta(cA, cB);
+        comparativoCategorias.push({ cat, cA, cB, deltaNum: delta });
+    });
+    comparativoCategorias.sort((a, b) => b.cB - a.cB);
 
     return {
         semanaBase: semKeyA,
         semanaComparada: semKeyB,
         geral: {
-            cuponsA: qteA,
-            cuponsB: qteB,
-            deltaCupons: deltaCupons,
-            vendaA: vA,
-            vendaB: vB,
-            deltaVenda: deltaVenda,
-            descontoA: dA,
-            descontoB: dB,
-            deltaDesconto: deltaDesconto
+            cuponsA: qteA, cuponsB: qteB, deltaCupons,
+            vendaA: vA, vendaB: vB, deltaVenda,
+            descontoA: dA, descontoB: dB, deltaDesconto,
+            margemA: mA, margemB: mB, deltaMargem,
+            pctA: pctA, pctB: pctB, deltaPctDesc
         },
         lojas: comparativoLojas,
-        vendedores: comparativoVendedores
+        vendedores: comparativoVendedores,
+        linhas: comparativoLinhas,
+        categorias: comparativoCategorias
     };
 }
 
 function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMesB = "Mês Alvo") {
-    const mapA = { cupons: new Set(), lojas: {}, vendedores: {}, vendaTotal: 0, descontoTotal: 0 };
-    const mapB = { cupons: new Set(), lojas: {}, vendedores: {}, vendaTotal: 0, descontoTotal: 0 };
+    const mapA = { cupons: new Set(), lojas: {}, vendedores: {}, linhas: {}, categorias: {}, vendaTotal: 0, descontoTotal: 0, margemTotal: 0, sumPctDesc: 0, countPct: 0 };
+    const mapB = { cupons: new Set(), lojas: {}, vendedores: {}, linhas: {}, categorias: {}, vendaTotal: 0, descontoTotal: 0, margemTotal: 0, sumPctDesc: 0, countPct: 0 };
 
     const processarMes = (recs, targetMap) => {
         recs.forEach(r => {
@@ -164,6 +214,8 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
             let codF = parseInt(r.CodFilial);
             let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${r.CodFilial}`;
             let vend = r.NmVendedor || 'N/A';
+            let cat = r.NmCategoria || 'N/A';
+            let linha = classificaLinha(cat);
 
             if (!targetMap.lojas[loja]) targetMap.lojas[loja] = new Set();
             if (nr) targetMap.lojas[loja].add(nr);
@@ -171,10 +223,25 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
             if (!targetMap.vendedores[vend]) targetMap.vendedores[vend] = new Set();
             if (nr) targetMap.vendedores[vend].add(nr);
 
+            if (!targetMap.linhas[linha]) targetMap.linhas[linha] = new Set();
+            if (nr) targetMap.linhas[linha].add(nr);
+
+            if (!targetMap.categorias[cat]) targetMap.categorias[cat] = new Set();
+            if (nr) targetMap.categorias[cat].add(nr);
+
             let vVenda = parseStrToNum(r.VlrVenda);
             let vDesc = parseStrToNum(r.VlrDescItens);
+            let vMargem = parseStrToNum(r.VlrMargemBruta);
+            let vPct = parseStrToNum(r['%DescontoFinal']);
+
             if (!isNaN(vVenda)) targetMap.vendaTotal += vVenda;
             if (!isNaN(vDesc)) targetMap.descontoTotal += vDesc;
+            if (!isNaN(vMargem)) targetMap.margemTotal += vMargem;
+
+            if (vPct > 0 || r['%DescontoFinal'] != undefined) {
+                targetMap.sumPctDesc += vPct;
+                targetMap.countPct++;
+            }
         });
     };
 
@@ -182,8 +249,8 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
     processarMes(recordsB, mapB);
 
     const mesesMap = {
-        [labelMesA]: { cupons: mapA.cupons, lojas: mapA.lojas, vendedores: mapA.vendedores, vendaTotal: mapA.vendaTotal, descontoTotal: mapA.descontoTotal },
-        [labelMesB]: { cupons: mapB.cupons, lojas: mapB.lojas, vendedores: mapB.vendedores, vendaTotal: mapB.vendaTotal, descontoTotal: mapB.descontoTotal }
+        [labelMesA]: mapA,
+        [labelMesB]: mapB
     };
 
     return {
@@ -195,51 +262,98 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
 function renderComparativoDashboard(compRes) {
     if (!compRes) return;
 
+    // 1. KPI CUPONS
     document.getElementById('comp-kpi-cupons').innerText = `${compRes.geral.cuponsA.toLocaleString('pt-BR')} ➔ ${compRes.geral.cuponsB.toLocaleString('pt-BR')}`;
     const badgeC = document.getElementById('comp-badge-cupons');
     let dC = compRes.geral.deltaCupons;
     badgeC.innerText = (dC > 0 ? '+' : '') + dC.toFixed(1) + '%';
     badgeC.className = 'delta-badge ' + (dC > 0 ? 'red' : dC < 0 ? 'green' : 'neutral');
 
+    // 2. KPI VENDIDO
     document.getElementById('comp-kpi-vendido').innerText = `R$ ${(compRes.geral.vendaA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.vendaB / 1000).toFixed(1)}k`;
     const badgeV = document.getElementById('comp-badge-vendido');
     let dV = compRes.geral.deltaVenda;
     badgeV.innerText = (dV > 0 ? '+' : '') + dV.toFixed(1) + '%';
     badgeV.className = 'delta-badge ' + (dV > 0 ? 'green' : dV < 0 ? 'red' : 'neutral');
 
+    // 3. KPI DESCONTO
     document.getElementById('comp-kpi-desconto').innerText = `R$ ${(compRes.geral.descontoA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.descontoB / 1000).toFixed(1)}k`;
     const badgeD = document.getElementById('comp-badge-desconto');
     let dD = compRes.geral.deltaDesconto;
     badgeD.innerText = (dD > 0 ? '+' : '') + dD.toFixed(1) + '%';
     badgeD.className = 'delta-badge ' + (dD > 0 ? 'red' : dD < 0 ? 'green' : 'neutral');
 
-    document.getElementById('th-sem-base-loja').innerText = compRes.semanaBase;
-    document.getElementById('th-sem-target-loja').innerText = compRes.semanaComparada;
-    document.getElementById('th-sem-base-vend').innerText = compRes.semanaBase;
-    document.getElementById('th-sem-target-vend').innerText = compRes.semanaComparada;
+    // 4. KPI MARGEM
+    const elMargem = document.getElementById('comp-kpi-margem');
+    if (elMargem) {
+        elMargem.innerText = `R$ ${(compRes.geral.margemA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.margemB / 1000).toFixed(1)}k`;
+        const badgeM = document.getElementById('comp-badge-margem');
+        let dM = compRes.geral.deltaMargem;
+        badgeM.innerText = (dM > 0 ? '+' : '') + dM.toFixed(1) + '%';
+        badgeM.className = 'delta-badge ' + (dM > 0 ? 'green' : dM < 0 ? 'red' : 'neutral');
+    }
 
+    // 5. KPI PCT DESCONTO
+    const elPct = document.getElementById('comp-kpi-pct-desc');
+    if (elPct) {
+        elPct.innerText = `${compRes.geral.pctA.toFixed(1)}% ➔ ${compRes.geral.pctB.toFixed(1)}%`;
+        const badgeP = document.getElementById('comp-badge-pct-desc');
+        let dP = compRes.geral.deltaPctDesc;
+        badgeP.innerText = (dP > 0 ? '+' : '') + dP.toFixed(1) + ' pp';
+        badgeP.className = 'delta-badge ' + (dP > 0 ? 'red' : dP < 0 ? 'green' : 'neutral');
+    }
+
+    // HEADERS DAS TABELAS
+    ['loja', 'vend', 'linha'].forEach(prefix => {
+        const hA = document.getElementById(`th-sem-base-${prefix}`);
+        const hB = document.getElementById(`th-sem-target-${prefix}`);
+        if (hA) hA.innerText = compRes.semanaBase;
+        if (hB) hB.innerText = compRes.semanaComparada;
+    });
+
+    // TABELA LOJAS
     const tbodyLojas = document.getElementById('tbody-comp-lojas');
-    tbodyLojas.innerHTML = compRes.lojas.slice(0, 15).map(l => `
-        <tr>
-            <td><strong>${l.loja}</strong></td>
-            <td>${l.cA.toLocaleString('pt-BR')} cupons</td>
-            <td>${l.cB.toLocaleString('pt-BR')} cupons</td>
-            <td><span class="delta-badge ${l.statusClass}">${l.deltaStr}</span></td>
-            <td>${l.statusLabel}</td>
-        </tr>
-    `).join('');
+    if (tbodyLojas) {
+        tbodyLojas.innerHTML = compRes.lojas.slice(0, 15).map(l => `
+            <tr>
+                <td><strong>${l.loja}</strong></td>
+                <td>${l.cA.toLocaleString('pt-BR')} cupons</td>
+                <td>${l.cB.toLocaleString('pt-BR')} cupons</td>
+                <td><span class="delta-badge ${l.statusClass}">${l.deltaStr}</span></td>
+                <td>${l.statusLabel}</td>
+            </tr>
+        `).join('');
+    }
 
+    // TABELA VENDEDORES
     const tbodyVend = document.getElementById('tbody-comp-vendedores');
-    tbodyVend.innerHTML = compRes.vendedores.slice(0, 15).map(v => `
-        <tr>
-            <td><strong>${v.vend}</strong></td>
-            <td>${v.cA.toLocaleString('pt-BR')} cupons</td>
-            <td>${v.cB.toLocaleString('pt-BR')} cupons</td>
-            <td><span class="delta-badge ${v.statusClass}">${v.deltaStr}</span></td>
-            <td>${v.statusLabel}</td>
-        </tr>
-    `).join('');
+    if (tbodyVend) {
+        tbodyVend.innerHTML = compRes.vendedores.slice(0, 15).map(v => `
+            <tr>
+                <td><strong>${v.vend}</strong></td>
+                <td>${v.cA.toLocaleString('pt-BR')} cupons</td>
+                <td>${v.cB.toLocaleString('pt-BR')} cupons</td>
+                <td><span class="delta-badge ${v.statusClass}">${v.deltaStr}</span></td>
+                <td>${v.statusLabel}</td>
+            </tr>
+        `).join('');
+    }
 
+    // TABELA LINHAS
+    const tbodyLinhas = document.getElementById('tbody-comp-linhas');
+    if (tbodyLinhas) {
+        tbodyLinhas.innerHTML = compRes.linhas.map(ln => `
+            <tr>
+                <td><strong>${ln.linha}</strong></td>
+                <td>${ln.cA.toLocaleString('pt-BR')} cupons</td>
+                <td>${ln.cB.toLocaleString('pt-BR')} cupons</td>
+                <td><span class="delta-badge ${ln.statusClass}">${ln.deltaStr}</span></td>
+                <td>${ln.statusLabel}</td>
+            </tr>
+        `).join('');
+    }
+
+    // GRÁFICOS DUPLOS
     const top10Lojas = compRes.lojas.slice(0, 10);
     drawDoubleBarChart('chartCompLojas',
         top10Lojas.map(l => l.loja.replace(/^\d+\s*-\s*/, '')),
@@ -253,15 +367,31 @@ function renderComparativoDashboard(compRes) {
         compRes.semanaBase, top10Vend.map(v => v.cA),
         compRes.semanaComparada, top10Vend.map(v => v.cB)
     );
+
+    drawDoubleBarChart('chartCompLinhas',
+        compRes.linhas.map(ln => ln.linha),
+        compRes.semanaBase, compRes.linhas.map(ln => ln.cA),
+        compRes.semanaComparada, compRes.linhas.map(ln => ln.cB)
+    );
+
+    const top10Cat = compRes.categorias.slice(0, 10);
+    drawDoubleBarChart('chartCompCat',
+        top10Cat.map(c => c.cat.substring(0, 18)),
+        compRes.semanaBase, top10Cat.map(c => c.cA),
+        compRes.semanaComparada, top10Cat.map(c => c.cB)
+    );
 }
 
 function drawDoubleBarChart(ctxId, labels, labelA, dataA, labelB, dataB) {
+    const elCanvas = document.getElementById(ctxId);
+    if (!elCanvas) return;
+
     if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
 
     const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
     const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
 
-    chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
+    chartsObj[ctxId] = new Chart(elCanvas, {
         type: 'bar',
         data: {
             labels: labels,

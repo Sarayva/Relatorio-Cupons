@@ -392,7 +392,7 @@
         }
 
         .kpi-card p {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -911,7 +911,7 @@
                 </div>
             </div>
 
-            <!-- TELA 2: COMPARATIVO SEMANAL E MENSAL -->
+            <!-- TELA 2: COMPARATIVO SEMANAL E MENSAL (EQUIPARADO À VISÃO GERAL) -->
             <div id="comparison-view" class="hidden">
                 <div class="kpi-grid">
                     <div class="kpi-card">
@@ -929,6 +929,16 @@
                         <p id="comp-kpi-desconto">R$ 0 ➔ R$ 0</p>
                         <div id="comp-badge-desconto" class="delta-badge neutral">0%</div>
                     </div>
+                    <div class="kpi-card">
+                        <h3>Margem Bruta (Δ%)</h3>
+                        <p id="comp-kpi-margem">R$ 0 ➔ R$ 0</p>
+                        <div id="comp-badge-margem" class="delta-badge neutral">0%</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3>% Médio de Desconto (Δ%)</h3>
+                        <p id="comp-kpi-pct-desc">0% ➔ 0%</p>
+                        <div id="comp-badge-pct-desc" class="delta-badge neutral">0 pp</div>
+                    </div>
                 </div>
 
                 <div class="charts-grid" style="margin-top: 1.5rem;">
@@ -939,6 +949,32 @@
                     <div class="chart-card">
                         <div class="chart-header">📊 Cupons por Vendedor (Comparativo)</div>
                         <div class="canvas-wrapper"><canvas id="chartCompVend"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">📊 Cupons por Linha de Medicamento (Comparativo)</div>
+                        <div class="canvas-wrapper"><canvas id="chartCompLinhas"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">📊 Top Categorias (Comparativo)</div>
+                        <div class="canvas-wrapper"><canvas id="chartCompCat"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <div class="chart-header">📋 Tabela Comparativa de Linhas de Medicamento</div>
+                    <div style="overflow-x: auto;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>Linha de Produto</th>
+                                    <th id="th-sem-base-linha">Período 1</th>
+                                    <th id="th-sem-target-linha">Período 2</th>
+                                    <th>Variação (Δ%)</th>
+                                    <th>Status de Desempenho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-comp-linhas"></tbody>
+                        </table>
                     </div>
                 </div>
 

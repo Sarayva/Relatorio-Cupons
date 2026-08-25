@@ -125,8 +125,8 @@ async function exportarExcelProfissional() {
             maxDate = datas[datas.length - 1].split(' ')[0];
         }
 
-        // 1. ABA RESUMO
-        const wsResumo = workbook.addWorksheet('Resumo', { views: [{ showGridLines: true }] });
+        // 1. ABA RESUMO EXECUTIVO
+        const wsResumo = workbook.addWorksheet('Resumo Executivo', { views: [{ showGridLines: true }] });
         wsResumo.mergeCells('A1:E1');
         const titleCell = wsResumo.getCell('A1');
         titleCell.value = 'RELATÓRIO EXECUTIVO - ANÁLISE DE CUPONS E DESCONTOS';
@@ -142,10 +142,17 @@ async function exportarExcelProfissional() {
         subCell.alignment = { vertical: 'middle', horizontal: 'center' };
         wsResumo.getRow(2).height = 22;
 
+        const sumVendidoStr = document.getElementById('kpi-vendido')?.innerText || 'R$ 0';
+        const sumDescStr = document.getElementById('kpi-desconto')?.innerText || 'R$ 0';
+        const sumMargemStr = document.getElementById('kpi-margem')?.innerText || 'R$ 0';
+
         const kpis = [
             ['Data de Emissão do Relatório', new Date().toLocaleDateString('pt-BR')],
             ['Período das Vendas Analisadas', minDate && maxDate ? `${minDate} até ${maxDate}` : 'Período Completo'],
             ['Total de Cupons Únicos Emitidos', totCupons],
+            ['Total Vendido Bruto', sumVendidoStr],
+            ['Total Concedido em Descontos', sumDescStr],
+            ['Margem Bruta Consolidada', sumMargemStr],
             ['Lojas Ativas com Emissão', arrLojas.length],
             ['Vendedores com Concessão de Descontos', arrVend.length]
         ];
@@ -244,9 +251,9 @@ async function exportarExcelProfissional() {
         applyZebraAndBorders(wsVend, 2);
         autoFitColumns(wsVend);
 
-        // 4. ABA POR TIPO DE DESCONTO
-        const wsTipo = workbook.addWorksheet('Por Tipo de Desconto', { views: [{ state: 'frozen', ySplit: 1 }] });
-        const hTipo = wsTipo.addRow(['Posição', 'Linha de Medicamento / Categoria', 'Qtd. Cupons', '% do Total']);
+        // 4. ABA POR LINHA DE MEDICAMENTO
+        const wsTipo = workbook.addWorksheet('Por Linha de Medicamento', { views: [{ state: 'frozen', ySplit: 1 }] });
+        const hTipo = wsTipo.addRow(['Posição', 'Linha de Medicamento', 'Qtd. Cupons', '% do Total']);
         formatHeaderRow(hTipo);
 
         arrLinha.forEach((l, idx) => {
@@ -259,8 +266,8 @@ async function exportarExcelProfissional() {
         applyZebraAndBorders(wsTipo, 2);
         autoFitColumns(wsTipo);
 
-        // 5. ABA POR DIA
-        const wsDia = workbook.addWorksheet('Por Dia', { views: [{ state: 'frozen', ySplit: 1 }] });
+        // 5. ABA POR DIA DA SEMANA
+        const wsDia = workbook.addWorksheet('Por Dia da Semana', { views: [{ state: 'frozen', ySplit: 1 }] });
         const hDia = wsDia.addRow(['Dia da Semana', 'Média de Cupons / Dia', '% do Total']);
         formatHeaderRow(hDia);
 
@@ -276,10 +283,10 @@ async function exportarExcelProfissional() {
         applyZebraAndBorders(wsDia, 2);
         autoFitColumns(wsDia);
 
-        // 6. ABA COMPARATIVO SEMANAL
+        // 6. ABA COMPARATIVO COMPLETO (LOJAS, VENDEDORES E LINHAS)
         const listaSemanasExp = Object.keys(GLOBAL_SEMANAS_MAP);
         if (listaSemanasExp.length > 1) {
-            const wsComp = workbook.addWorksheet('Comparativo Semanal', { views: [{ state: 'frozen', ySplit: 1 }] });
+            const wsComp = workbook.addWorksheet('Comparativo Completo', { views: [{ showGridLines: true }] });
             const selectBase = document.getElementById('select-week-base');
             const selectTarget = document.getElementById('select-week-target');
 
@@ -288,30 +295,111 @@ async function exportarExcelProfissional() {
             const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, semA, semB);
 
             if (compRes) {
-                const hComp = wsComp.addRow(['Loja / Unidade', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho']);
-                formatHeaderRow(hComp);
+                // TÍTULO DO COMPARATIVO
+                wsComp.mergeCells('A1:E1');
+                const tCompCell = wsComp.getCell('A1');
+                tCompCell.value = `COMPARATIVO ANÁLITICO: ${semA} vs ${semB}`;
+                tCompCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
+                tCompCell.font = TITLE_FONT;
+                tCompCell.alignment = { vertical: 'middle', horizontal: 'center' };
+                wsComp.getRow(1).height = 36;
+
+                // SEÇÃO 1: COMPARATIVO POR LOJA
+                let rIdx = 3;
+                const rHLoja = wsComp.getRow(rIdx);
+                rHLoja.getCell(1).value = 'TABELA COMPARATIVA POR LOJA / UNIDADE';
+                rHLoja.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
+                rIdx++;
+
+                const hCompLojas = wsComp.getRow(rIdx);
+                hCompLojas.values = ['Loja / Unidade', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                formatHeaderRow(hCompLojas);
+                rIdx++;
 
                 compRes.lojas.forEach(l => {
                     let statusBg = l.deltaNum > 0 ? 'FFFADBD8' : l.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
                     let statusFg = l.deltaNum > 0 ? 'FFC0392B' : l.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
 
-                    const row = wsComp.addRow([l.loja, l.cA, l.cB, l.deltaNum / 100, l.statusLabel]);
+                    const row = wsComp.getRow(rIdx);
+                    row.values = [l.loja, l.cA, l.cB, l.deltaNum / 100, l.statusLabel];
                     row.getCell(2).numFmt = '#,##0';
                     row.getCell(3).numFmt = '#,##0';
                     row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
 
-                    const cellVar = row.getCell(4);
-                    const cellSt = row.getCell(5);
+                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
 
-                    cellVar.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    cellVar.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-                    cellSt.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    cellSt.font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-                    cellSt.alignment = { horizontal: 'center' };
+                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                    row.getCell(5).alignment = { horizontal: 'center' };
+                    rIdx++;
                 });
 
-                applyZebraAndBorders(wsComp, 2);
+                rIdx += 2;
+
+                // SEÇÃO 2: COMPARATIVO POR VENDEDOR
+                const rHVend = wsComp.getRow(rIdx);
+                rHVend.getCell(1).value = 'TABELA COMPARATIVA POR VENDEDOR';
+                rHVend.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
+                rIdx++;
+
+                const hCompVend = wsComp.getRow(rIdx);
+                hCompVend.values = ['Vendedor', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                formatHeaderRow(hCompVend);
+                rIdx++;
+
+                compRes.vendedores.slice(0, 15).forEach(v => {
+                    let statusBg = v.deltaNum > 0 ? 'FFFADBD8' : v.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
+                    let statusFg = v.deltaNum > 0 ? 'FFC0392B' : v.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
+
+                    const row = wsComp.getRow(rIdx);
+                    row.values = [v.vend, v.cA, v.cB, v.deltaNum / 100, v.statusLabel];
+                    row.getCell(2).numFmt = '#,##0';
+                    row.getCell(3).numFmt = '#,##0';
+                    row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
+
+                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+
+                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                    row.getCell(5).alignment = { horizontal: 'center' };
+                    rIdx++;
+                });
+
+                rIdx += 2;
+
+                // SEÇÃO 3: COMPARATIVO POR LINHA DE MEDICAMENTO
+                const rHLinha = wsComp.getRow(rIdx);
+                rHLinha.getCell(1).value = 'TABELA COMPARATIVA POR LINHA DE MEDICAMENTO';
+                rHLinha.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
+                rIdx++;
+
+                const hCompLinha = wsComp.getRow(rIdx);
+                hCompLinha.values = ['Linha de Medicamento', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                formatHeaderRow(hCompLinha);
+                rIdx++;
+
+                compRes.linhas.forEach(ln => {
+                    let statusBg = ln.deltaNum > 0 ? 'FFFADBD8' : ln.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
+                    let statusFg = ln.deltaNum > 0 ? 'FFC0392B' : ln.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
+
+                    const row = wsComp.getRow(rIdx);
+                    row.values = [ln.linha, ln.cA, ln.cB, ln.deltaNum / 100, ln.statusLabel];
+                    row.getCell(2).numFmt = '#,##0';
+                    row.getCell(3).numFmt = '#,##0';
+                    row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
+
+                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+
+                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
+                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
+                    row.getCell(5).alignment = { horizontal: 'center' };
+                    rIdx++;
+                });
+
+                applyZebraAndBorders(wsComp, 4);
                 autoFitColumns(wsComp);
             }
         }
