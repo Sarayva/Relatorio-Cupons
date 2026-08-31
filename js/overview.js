@@ -360,7 +360,7 @@ function calcularDashboard(records) {
     document.getElementById('kpi-lojas-vend').innerText = `${gLojas.size} / ${gVend.size}`;
     document.getElementById('kpi-vendido').innerText = fmtBL.format(sumVendido);
     document.getElementById('kpi-desconto').innerText = fmtBL.format(sumDesc);
-    document.getElementById('kpi-pct-desc').innerText = countPct ? (sumPctDesc / countPct).toFixed(1) + '%' : '0%';
+    document.getElementById('kpi-pct-desc').innerText = countPct ? (sumPctDesc / countPct).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '0,0%';
     document.getElementById('kpi-margem').innerText = fmtBL.format(sumMargem);
 
     const arrLojas = Object.entries(pLoja).map(([nome, set]) => ({ nome, q: set.size })).sort((a, b) => b.q - a.q);

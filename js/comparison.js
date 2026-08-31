@@ -4,6 +4,29 @@
 
 let GLOBAL_SEMANAS_MAP = {};
 
+function formatDeltaPct(delta) {
+    if (isNaN(delta) || !isFinite(delta)) return '0,0%';
+    if (delta > 999) return '>+999%';
+    if (delta < -999) return '<-999%';
+    const sign = delta > 0 ? '+' : '';
+    const formatted = Math.abs(delta).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `${sign}${delta < 0 ? '-' : ''}${formatted}%`;
+}
+
+function formatDeltaPP(deltaPP) {
+    if (isNaN(deltaPP) || !isFinite(deltaPP)) return '0,0 pp';
+    if (deltaPP > 999) return '>+999 pp';
+    if (deltaPP < -999) return '<-999 pp';
+    const sign = deltaPP > 0 ? '+' : '';
+    const formatted = Math.abs(deltaPP).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `${sign}${deltaPP < 0 ? '-' : ''}${formatted} pp`;
+}
+
+function formatPctBR(num) {
+    if (isNaN(num) || !isFinite(num)) return '0,0%';
+    return num.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+}
+
 function getWeekInterval(dateStr) {
     if (!dateStr) return null;
     let str = (dateStr + "").trim().split(" ")[0];
@@ -146,7 +169,7 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
         let delta = calcDelta(cA, cB);
         let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
         let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
-        comparativoLojas.push({ loja, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+        comparativoLojas.push({ loja, cA, cB, deltaNum: delta, deltaStr: formatDeltaPct(delta), statusClass, statusLabel });
     });
     comparativoLojas.sort((a, b) => b.cB - a.cB);
 
@@ -159,7 +182,7 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
         let delta = calcDelta(cA, cB);
         let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
         let statusLabel = delta > 0 ? '🔴 Aumento (Alerta)' : delta < 0 ? '🟢 Redução (Bom)' : '🟡 Estável';
-        comparativoVendedores.push({ vend, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+        comparativoVendedores.push({ vend, cA, cB, deltaNum: delta, deltaStr: formatDeltaPct(delta), statusClass, statusLabel });
     });
     comparativoVendedores.sort((a, b) => b.cB - a.cB);
 
@@ -172,7 +195,7 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
         let delta = calcDelta(cA, cB);
         let statusClass = delta > 0 ? 'red' : delta < 0 ? 'green' : 'neutral';
         let statusLabel = delta > 0 ? '🔴 Aumento' : delta < 0 ? '🟢 Redução' : '🟡 Estável';
-        comparativoLinhas.push({ linha, cA, cB, deltaNum: delta, deltaStr: (delta > 0 ? '+' : '') + delta.toFixed(1) + '%', statusClass, statusLabel });
+        comparativoLinhas.push({ linha, cA, cB, deltaNum: delta, deltaStr: formatDeltaPct(delta), statusClass, statusLabel });
     });
     comparativoLinhas.sort((a, b) => b.cB - a.cB);
 
@@ -264,44 +287,46 @@ function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMe
 function renderComparativoDashboard(compRes) {
     if (!compRes) return;
 
+    const fmtK = (val) => (val / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'k';
+
     // 1. KPI CUPONS
     document.getElementById('comp-kpi-cupons').innerText = `${compRes.geral.cuponsA.toLocaleString('pt-BR')} ➔ ${compRes.geral.cuponsB.toLocaleString('pt-BR')}`;
     const badgeC = document.getElementById('comp-badge-cupons');
     let dC = compRes.geral.deltaCupons;
-    badgeC.innerText = (dC > 0 ? '+' : '') + dC.toFixed(1) + '%';
+    badgeC.innerText = formatDeltaPct(dC);
     badgeC.className = 'delta-badge ' + (dC > 0 ? 'red' : dC < 0 ? 'green' : 'neutral');
 
     // 2. KPI VENDIDO
-    document.getElementById('comp-kpi-vendido').innerText = `R$ ${(compRes.geral.vendaA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.vendaB / 1000).toFixed(1)}k`;
+    document.getElementById('comp-kpi-vendido').innerText = `R$ ${fmtK(compRes.geral.vendaA)} ➔ R$ ${fmtK(compRes.geral.vendaB)}`;
     const badgeV = document.getElementById('comp-badge-vendido');
     let dV = compRes.geral.deltaVenda;
-    badgeV.innerText = (dV > 0 ? '+' : '') + dV.toFixed(1) + '%';
+    badgeV.innerText = formatDeltaPct(dV);
     badgeV.className = 'delta-badge ' + (dV > 0 ? 'green' : dV < 0 ? 'red' : 'neutral');
 
     // 3. KPI DESCONTO
-    document.getElementById('comp-kpi-desconto').innerText = `R$ ${(compRes.geral.descontoA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.descontoB / 1000).toFixed(1)}k`;
+    document.getElementById('comp-kpi-desconto').innerText = `R$ ${fmtK(compRes.geral.descontoA)} ➔ R$ ${fmtK(compRes.geral.descontoB)}`;
     const badgeD = document.getElementById('comp-badge-desconto');
     let dD = compRes.geral.deltaDesconto;
-    badgeD.innerText = (dD > 0 ? '+' : '') + dD.toFixed(1) + '%';
+    badgeD.innerText = formatDeltaPct(dD);
     badgeD.className = 'delta-badge ' + (dD > 0 ? 'red' : dD < 0 ? 'green' : 'neutral');
 
     // 4. KPI MARGEM
     const elMargem = document.getElementById('comp-kpi-margem');
     if (elMargem) {
-        elMargem.innerText = `R$ ${(compRes.geral.margemA / 1000).toFixed(1)}k ➔ R$ ${(compRes.geral.margemB / 1000).toFixed(1)}k`;
+        elMargem.innerText = `R$ ${fmtK(compRes.geral.margemA)} ➔ R$ ${fmtK(compRes.geral.margemB)}`;
         const badgeM = document.getElementById('comp-badge-margem');
         let dM = compRes.geral.deltaMargem;
-        badgeM.innerText = (dM > 0 ? '+' : '') + dM.toFixed(1) + '%';
+        badgeM.innerText = formatDeltaPct(dM);
         badgeM.className = 'delta-badge ' + (dM > 0 ? 'green' : dM < 0 ? 'red' : 'neutral');
     }
 
     // 5. KPI PCT DESCONTO
     const elPct = document.getElementById('comp-kpi-pct-desc');
     if (elPct) {
-        elPct.innerText = `${compRes.geral.pctA.toFixed(1)}% ➔ ${compRes.geral.pctB.toFixed(1)}%`;
+        elPct.innerText = `${formatPctBR(compRes.geral.pctA)} ➔ ${formatPctBR(compRes.geral.pctB)}`;
         const badgeP = document.getElementById('comp-badge-pct-desc');
         let dP = compRes.geral.deltaPctDesc;
-        badgeP.innerText = (dP > 0 ? '+' : '') + dP.toFixed(1) + ' pp';
+        badgeP.innerText = formatDeltaPP(dP);
         badgeP.className = 'delta-badge ' + (dP > 0 ? 'red' : dP < 0 ? 'green' : 'neutral');
     }
 
