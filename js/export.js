@@ -403,16 +403,22 @@ async function exportarExcelProfissional() {
         const wsGraficos = workbook.addWorksheet('Gráficos', { views: [{ showGridLines: true }] });
 
         const getExportableChartImage = (canvas) => {
-            if (!canvas) return null;
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const ctx = tempCanvas.getContext('2d');
+            if (!canvas || !canvas.width || !canvas.height) return null;
+            try {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const ctx = tempCanvas.getContext('2d');
 
-            ctx.fillStyle = isDarkTheme ? '#181818' : '#ffffff';
-            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            ctx.drawImage(canvas, 0, 0);
-            return tempCanvas.toDataURL('image/png');
+                const isDark = !document.body.classList.contains('light-theme');
+                ctx.fillStyle = isDark ? '#181818' : '#ffffff';
+                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                ctx.drawImage(canvas, 0, 0);
+                return tempCanvas.toDataURL('image/png');
+            } catch (e) {
+                console.warn('Não foi possível obter imagem do gráfico:', canvas.id, e);
+                return null;
+            }
         };
 
         const chartPairs = [
@@ -444,11 +450,13 @@ async function exportarExcelProfissional() {
                 const canvasL = document.getElementById(leftChart.id);
                 if (canvasL) {
                     const imgDataL = getExportableChartImage(canvasL);
-                    const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
-                    wsGraficos.addImage(imageIdL, {
-                        tl: { col: 0, row: startRow },
-                        ext: { width: 590, height: 320 }
-                    });
+                    if (imgDataL) {
+                        const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
+                        wsGraficos.addImage(imageIdL, {
+                            tl: { col: 0, row: startRow },
+                            ext: { width: 590, height: 320 }
+                        });
+                    }
                 }
             }
 
@@ -460,11 +468,13 @@ async function exportarExcelProfissional() {
                 const canvasR = document.getElementById(rightChart.id);
                 if (canvasR) {
                     const imgDataR = getExportableChartImage(canvasR);
-                    const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
-                    wsGraficos.addImage(imageIdR, {
-                        tl: { col: 14, row: startRow },
-                        ext: { width: 590, height: 320 }
-                    });
+                    if (imgDataR) {
+                        const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
+                        wsGraficos.addImage(imageIdR, {
+                            tl: { col: 14, row: startRow },
+                            ext: { width: 590, height: 320 }
+                        });
+                    }
                 }
             }
 
