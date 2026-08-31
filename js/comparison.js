@@ -42,21 +42,34 @@ function getWeekInterval(dateStr, minDateObj = null, maxDateObj = null) {
     }
     if (!d || isNaN(d.getTime())) return null;
 
-    let day = d.getDay();
-    let diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
-    let monday = new Date(d.getFullYear(), d.getMonth(), diffToMonday);
-
-    let sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-
-    let startDt = monday;
-    if (minDateObj && monday < minDateObj) {
-        startDt = minDateObj;
+    if (!minDateObj) {
+        let day = d.getDay();
+        let diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+        let monday = new Date(d.getFullYear(), d.getMonth(), diffToMonday);
+        let sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        const fmt = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
+        return `${fmt(monday)} a ${fmt(sunday)}`;
     }
 
-    let endDt = sunday;
-    if (maxDateObj && sunday > maxDateObj) {
-        endDt = maxDateObj;
+    // Normaliza para início do dia (00:00:00) para evitar problemas de fuso/horário
+    let minDt = new Date(minDateObj.getFullYear(), minDateObj.getMonth(), minDateObj.getDate());
+    let currDt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    let diffDays = Math.floor((currDt.getTime() - minDt.getTime()) / (1000 * 60 * 60 * 24));
+    let periodIdx = Math.floor(diffDays / 7);
+
+    let startDt = new Date(minDt);
+    startDt.setDate(minDt.getDate() + (periodIdx * 7));
+
+    let endDt = new Date(startDt);
+    endDt.setDate(startDt.getDate() + 6);
+
+    if (maxDateObj) {
+        let maxDt = new Date(maxDateObj.getFullYear(), maxDateObj.getMonth(), maxDateObj.getDate());
+        if (endDt > maxDt) {
+            endDt = maxDt;
+        }
     }
 
     const fmt = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
