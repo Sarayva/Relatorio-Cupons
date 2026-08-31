@@ -288,7 +288,7 @@ function readExcelFile(file) {
                 const workbook = XLSX.read(data, { type: 'array' });
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                 const records = parseExcelRecords(json);
                 resolve(records);
             } catch (err) {
