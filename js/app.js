@@ -338,9 +338,9 @@ async function processFile(file) {
             selectBase.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
             selectTarget.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
 
-            // Seleção Cronológica Padrão (Semana Antiga na 1ª Coluna, Semana Recente na 2ª Coluna)
+            // Seleção Cronológica Padrão (Semana Inicial no 1º Seletor, Semana Seguinte no 2º Seletor)
             selectBase.value = listaSemanas[0];
-            selectTarget.value = listaSemanas[listaSemanas.length - 1];
+            selectTarget.value = listaSemanas[1] || listaSemanas[listaSemanas.length - 1];
 
             const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
             renderComparativoDashboard(compRes);

@@ -38,7 +38,8 @@ function getWeekStartDate(intervaloStr) {
     if (parts.length < 2) return 0;
     let day = parseInt(parts[0]) || 0;
     let month = parseInt(parts[1]) || 0;
-    return month * 100 + day;
+    let year = new Date().getFullYear();
+    return new Date(year, month - 1, day).getTime();
 }
 
 function agruparPorSemanas(records) {
