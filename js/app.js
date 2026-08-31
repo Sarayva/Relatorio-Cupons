@@ -335,23 +335,127 @@ async function processFile(file) {
 
         if (listaSemanas.length >= 2) {
             viewModeBar.classList.remove('hidden');
-            selectBase.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
-            selectTarget.innerHTML = listaSemanas.map(s => `<option value="${s}">${s}</option>`).join('');
 
-            // Seleção Cronológica Padrão (Semana Inicial no 1º Seletor, Semana Seguinte no 2º Seletor)
-            selectBase.value = listaSemanas[0];
-            selectTarget.value = listaSemanas[1] || listaSemanas[listaSemanas.length - 1];
+            const optionsBaseContainer = document.getElementById('options-ms-base');
+            const optionsTargetContainer = document.getElementById('options-ms-target');
+            const btnMsBase = document.getElementById('btn-ms-base');
+            const btnMsTarget = document.getElementById('btn-ms-target');
+            const dropdownBase = document.getElementById('dropdown-ms-base');
+            const dropdownTarget = document.getElementById('dropdown-ms-target');
+            const labelBase = document.getElementById('label-ms-base');
+            const labelTarget = document.getElementById('label-ms-target');
 
-            const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
-            renderComparativoDashboard(compRes);
+            // Render options
+            optionsBaseContainer.innerHTML = listaSemanas.map((s, idx) => `
+                <label class="ms-option-label">
+                    <input type="checkbox" value="${s}" ${idx === 0 ? 'checked' : ''}>
+                    <span>${s}</span>
+                </label>
+            `).join('');
 
-            const handleWeekSelect = () => {
-                const updatedComp = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
-                renderComparativoDashboard(updatedComp);
+            optionsTargetContainer.innerHTML = listaSemanas.map((s, idx) => `
+                <label class="ms-option-label">
+                    <input type="checkbox" value="${s}" ${idx === 1 || (listaSemanas.length === 1 && idx === 0) ? 'checked' : ''}>
+                    <span>${s}</span>
+                </label>
+            `).join('');
+
+            const updateSelection = () => {
+                const checkedBase = Array.from(optionsBaseContainer.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+                const checkedTarget = Array.from(optionsTargetContainer.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+
+                // Guarantee at least 1 checked
+                if (checkedBase.length === 0) {
+                    optionsBaseContainer.querySelector('input[type="checkbox"]').checked = true;
+                    checkedBase.push(listaSemanas[0]);
+                }
+                if (checkedTarget.length === 0) {
+                    const fallbackIdx = listaSemanas.length > 1 ? 1 : 0;
+                    optionsTargetContainer.querySelectorAll('input[type="checkbox"]')[fallbackIdx].checked = true;
+                    checkedTarget.push(listaSemanas[fallbackIdx]);
+                }
+
+                GLOBAL_SELECTED_BASE_WEEKS = checkedBase;
+                GLOBAL_SELECTED_TARGET_WEEKS = checkedTarget;
+
+                // Update Button Labels
+                if (checkedBase.length === listaSemanas.length) {
+                    labelBase.innerText = `Todas (${checkedBase.length})`;
+                } else if (checkedBase.length === 1) {
+                    labelBase.innerText = checkedBase[0];
+                } else {
+                    labelBase.innerText = `${checkedBase.length} Semanas`;
+                }
+
+                if (checkedTarget.length === listaSemanas.length) {
+                    labelTarget.innerText = `Todas (${checkedTarget.length})`;
+                } else if (checkedTarget.length === 1) {
+                    labelTarget.innerText = checkedTarget[0];
+                } else {
+                    labelTarget.innerText = `${checkedTarget.length} Semanas`;
+                }
+
+                const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, checkedBase, checkedTarget);
+                renderComparativoDashboard(compRes);
             };
 
-            selectBase.onchange = handleWeekSelect;
-            selectTarget.onchange = handleWeekSelect;
+            // Event Listeners for dropdown buttons
+            btnMsBase.onclick = (e) => {
+                e.stopPropagation();
+                dropdownBase.classList.toggle('hidden');
+                dropdownTarget.classList.add('hidden');
+            };
+
+            btnMsTarget.onclick = (e) => {
+                e.stopPropagation();
+                dropdownTarget.classList.toggle('hidden');
+                dropdownBase.classList.add('hidden');
+            };
+
+            // Event Listeners for Checkbox changes
+            optionsBaseContainer.onchange = updateSelection;
+            optionsTargetContainer.onchange = updateSelection;
+
+            // Action Buttons
+            document.getElementById('btn-all-base').onclick = (e) => {
+                e.stopPropagation();
+                optionsBaseContainer.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+                updateSelection();
+            };
+
+            document.getElementById('btn-clear-base').onclick = (e) => {
+                e.stopPropagation();
+                optionsBaseContainer.querySelectorAll('input[type="checkbox"]').forEach((c, idx) => c.checked = idx === 0);
+                updateSelection();
+            };
+
+            document.getElementById('btn-all-target').onclick = (e) => {
+                e.stopPropagation();
+                optionsTargetContainer.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+                updateSelection();
+            };
+
+            document.getElementById('btn-clear-target').onclick = (e) => {
+                e.stopPropagation();
+                optionsTargetContainer.querySelectorAll('input[type="checkbox"]').forEach((c, idx) => c.checked = idx === (listaSemanas.length > 1 ? 1 : 0));
+                updateSelection();
+            };
+
+            // Close dropdowns on outside click
+            if (!window.msOutsideClickListening) {
+                window.msOutsideClickListening = true;
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.multi-select-container')) {
+                        const dBase = document.getElementById('dropdown-ms-base');
+                        const dTarget = document.getElementById('dropdown-ms-target');
+                        if (dBase) dBase.classList.add('hidden');
+                        if (dTarget) dTarget.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Initial call to set labels & render
+            updateSelection();
 
         } else {
             viewModeBar.classList.add('hidden');

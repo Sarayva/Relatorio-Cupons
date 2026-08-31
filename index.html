@@ -647,7 +647,12 @@
             font-weight: 600;
         }
 
-        .week-select {
+        .multi-select-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .multi-select-btn {
             background: var(--card-bg);
             color: var(--text-main);
             border: 1px solid var(--border);
@@ -655,7 +660,88 @@
             border-radius: 6px;
             font-size: 0.88rem;
             font-weight: 600;
-            outline: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 175px;
+            justify-content: space-between;
+            transition: border-color 0.2s ease;
+        }
+
+        .multi-select-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .multi-select-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            min-width: 230px;
+            padding: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .multi-select-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.4rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .btn-ms-action {
+            background: var(--header-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-ms-action:hover {
+            color: var(--text-main);
+            border-color: var(--accent);
+        }
+
+        .multi-select-options {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .ms-option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 0.35rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.15s ease;
+        }
+
+        .ms-option-label:hover {
+            background: var(--header-bg);
+        }
+
+        .ms-option-label input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 15px;
+            height: 15px;
             cursor: pointer;
         }
 
@@ -839,10 +925,37 @@
                 <button id="tab-comparison" class="view-tab">📈 Comparativo <span class="tab-badge">Novo</span></button>
             </div>
             <div id="comparison-selectors" class="comparison-selectors hidden">
-                <span>Períodos:</span>
-                <select id="select-week-base" class="week-select"></select>
-                <span>vs</span>
-                <select id="select-week-target" class="week-select"></select>
+                <span style="font-weight: 700;">Base:</span>
+                <div class="multi-select-container">
+                    <button type="button" class="multi-select-btn" id="btn-ms-base">
+                        <span id="label-ms-base">Selecione...</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multi-select-dropdown hidden" id="dropdown-ms-base">
+                        <div class="multi-select-actions">
+                            <button type="button" class="btn-ms-action" id="btn-all-base">Selecionar Todas</button>
+                            <button type="button" class="btn-ms-action" id="btn-clear-base">Limpar</button>
+                        </div>
+                        <div class="multi-select-options" id="options-ms-base"></div>
+                    </div>
+                </div>
+
+                <span style="margin: 0 0.2rem; font-weight: 700; color: var(--accent);">vs</span>
+
+                <span style="font-weight: 700;">Comparado:</span>
+                <div class="multi-select-container">
+                    <button type="button" class="multi-select-btn" id="btn-ms-target">
+                        <span id="label-ms-target">Selecione...</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="multi-select-dropdown hidden" id="dropdown-ms-target">
+                        <div class="multi-select-actions">
+                            <button type="button" class="btn-ms-action" id="btn-all-target">Selecionar Todas</button>
+                            <button type="button" class="btn-ms-action" id="btn-clear-target">Limpar</button>
+                        </div>
+                        <div class="multi-select-options" id="options-ms-target"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

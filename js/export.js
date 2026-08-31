@@ -287,18 +287,18 @@ async function exportarExcelProfissional() {
         const listaSemanasExp = Object.keys(GLOBAL_SEMANAS_MAP);
         if (listaSemanasExp.length > 1) {
             const wsComp = workbook.addWorksheet('Comparativo Completo', { views: [{ showGridLines: true }] });
-            const selectBase = document.getElementById('select-week-base');
-            const selectTarget = document.getElementById('select-week-target');
-
-            const semA = selectBase?.value || listaSemanasExp[0];
-            const semB = selectTarget?.value || listaSemanasExp[listaSemanasExp.length - 1];
+            const semA = (typeof GLOBAL_SELECTED_BASE_WEEKS !== 'undefined' && GLOBAL_SELECTED_BASE_WEEKS.length) ? GLOBAL_SELECTED_BASE_WEEKS : listaSemanasExp[0];
+            const semB = (typeof GLOBAL_SELECTED_TARGET_WEEKS !== 'undefined' && GLOBAL_SELECTED_TARGET_WEEKS.length) ? GLOBAL_SELECTED_TARGET_WEEKS : listaSemanasExp[listaSemanasExp.length - 1];
             const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, semA, semB);
 
             if (compRes) {
+                const semALabel = compRes.semanaBase;
+                const semBLabel = compRes.semanaComparada;
+
                 // TÍTULO DO COMPARATIVO
                 wsComp.mergeCells('A1:E1');
                 const tCompCell = wsComp.getCell('A1');
-                tCompCell.value = `COMPARATIVO ANÁLITICO: ${semA} vs ${semB}`;
+                tCompCell.value = `COMPARATIVO ANÁLITICO: ${semALabel} vs ${semBLabel}`;
                 tCompCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
                 tCompCell.font = TITLE_FONT;
                 tCompCell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -312,7 +312,7 @@ async function exportarExcelProfissional() {
                 rIdx++;
 
                 const hCompLojas = wsComp.getRow(rIdx);
-                hCompLojas.values = ['Loja / Unidade', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompLojas.values = ['Loja / Unidade', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
                 formatHeaderRow(hCompLojas);
                 rIdx++;
 
@@ -344,7 +344,7 @@ async function exportarExcelProfissional() {
                 rIdx++;
 
                 const hCompVend = wsComp.getRow(rIdx);
-                hCompVend.values = ['Vendedor', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompVend.values = ['Vendedor', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
                 formatHeaderRow(hCompVend);
                 rIdx++;
 
@@ -376,7 +376,7 @@ async function exportarExcelProfissional() {
                 rIdx++;
 
                 const hCompLinha = wsComp.getRow(rIdx);
-                hCompLinha.values = ['Linha de Medicamento', `Cupons (${semA})`, `Cupons (${semB})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompLinha.values = ['Linha de Medicamento', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
                 formatHeaderRow(hCompLinha);
                 rIdx++;
 

@@ -3,6 +3,8 @@
 // ==========================================
 
 let GLOBAL_SEMANAS_MAP = {};
+let GLOBAL_SELECTED_BASE_WEEKS = [];
+let GLOBAL_SELECTED_TARGET_WEEKS = [];
 
 function formatDeltaPct(delta) {
     if (isNaN(delta) || !isFinite(delta)) return '0,0%';
@@ -183,9 +185,73 @@ function agruparPorSemanas(records) {
     return semanasMap;
 }
 
+function fundirSemanas(semanasMap, keysArray) {
+    if (!keysArray || keysArray.length === 0) return null;
+    const validKeys = (Array.isArray(keysArray) ? keysArray : [keysArray]).filter(k => semanasMap[k]);
+    if (validKeys.length === 0) return null;
+
+    if (validKeys.length === 1) {
+        return semanasMap[validKeys[0]];
+    }
+
+    const label = validKeys.length > 3 ? `${validKeys.length} Semanas` : validKeys.join(' + ');
+
+    const merged = {
+        intervalo: label,
+        cupons: new Set(),
+        lojas: {},
+        vendedores: {},
+        linhas: {},
+        categorias: {},
+        vendaTotal: 0,
+        descontoTotal: 0,
+        margemTotal: 0,
+        sumPctDesc: 0,
+        countPct: 0
+    };
+
+    validKeys.forEach(k => {
+        const sem = semanasMap[k];
+        if (!sem) return;
+
+        sem.cupons.forEach(c => merged.cupons.add(c));
+
+        Object.keys(sem.lojas).forEach(loja => {
+            if (!merged.lojas[loja]) merged.lojas[loja] = new Set();
+            sem.lojas[loja].forEach(c => merged.lojas[loja].add(c));
+        });
+
+        Object.keys(sem.vendedores).forEach(vend => {
+            if (!merged.vendedores[vend]) merged.vendedores[vend] = new Set();
+            sem.vendedores[vend].forEach(c => merged.vendedores[vend].add(c));
+        });
+
+        Object.keys(sem.linhas).forEach(linha => {
+            if (!merged.linhas[linha]) merged.linhas[linha] = new Set();
+            sem.linhas[linha].forEach(c => merged.linhas[linha].add(c));
+        });
+
+        Object.keys(sem.categorias).forEach(cat => {
+            if (!merged.categorias[cat]) merged.categorias[cat] = new Set();
+            sem.categorias[cat].forEach(c => merged.categorias[cat].add(c));
+        });
+
+        merged.vendaTotal += sem.vendaTotal;
+        merged.descontoTotal += sem.descontoTotal;
+        merged.margemTotal += sem.margemTotal;
+        merged.sumPctDesc += sem.sumPctDesc;
+        merged.countPct += sem.countPct;
+    });
+
+    return merged;
+}
+
 function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
-    const semA = semanasMap[semKeyA];
-    const semB = semanasMap[semKeyB];
+    const keysA = Array.isArray(semKeyA) ? semKeyA : [semKeyA];
+    const keysB = Array.isArray(semKeyB) ? semKeyB : [semKeyB];
+
+    const semA = fundirSemanas(semanasMap, keysA);
+    const semB = fundirSemanas(semanasMap, keysB);
 
     if (!semA || !semB) return null;
 
@@ -265,8 +331,8 @@ function calcularComparativoSemanal(semanasMap, semKeyA, semKeyB) {
     comparativoCategorias.sort((a, b) => b.cB - a.cB);
 
     return {
-        semanaBase: semKeyA,
-        semanaComparada: semKeyB,
+        semanaBase: semA.intervalo,
+        semanaComparada: semB.intervalo,
         geral: {
             cuponsA: qteA, cuponsB: qteB, deltaCupons,
             vendaA: vA, vendaB: vB, deltaVenda,
