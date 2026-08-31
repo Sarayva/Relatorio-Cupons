@@ -333,123 +333,75 @@ async function processFile(file) {
         const selectBase = document.getElementById('select-week-base');
         const selectTarget = document.getElementById('select-week-target');
 
-        if (listaSemanas.length >= 2) {
+        if (listaSemanas.length >= 1) {
             viewModeBar.classList.remove('hidden');
 
-            const optionsBaseContainer = document.getElementById('options-ms-base');
-            const optionsTargetContainer = document.getElementById('options-ms-target');
-            const btnMsBase = document.getElementById('btn-ms-base');
-            const btnMsTarget = document.getElementById('btn-ms-target');
-            const dropdownBase = document.getElementById('dropdown-ms-base');
-            const dropdownTarget = document.getElementById('dropdown-ms-target');
-            const labelBase = document.getElementById('label-ms-base');
-            const labelTarget = document.getElementById('label-ms-target');
+            const optionsContainer = document.getElementById('options-ms-weeks');
+            const btnMsWeeks = document.getElementById('btn-ms-weeks');
+            const dropdownWeeks = document.getElementById('dropdown-ms-weeks');
+            const labelWeeks = document.getElementById('label-ms-weeks');
 
-            // Render options
-            optionsBaseContainer.innerHTML = listaSemanas.map((s, idx) => `
+            // Render options (todas selecionadas por padrão)
+            optionsContainer.innerHTML = listaSemanas.map((s) => `
                 <label class="ms-option-label">
-                    <input type="checkbox" value="${s}" ${idx === 0 ? 'checked' : ''}>
-                    <span>${s}</span>
-                </label>
-            `).join('');
-
-            optionsTargetContainer.innerHTML = listaSemanas.map((s, idx) => `
-                <label class="ms-option-label">
-                    <input type="checkbox" value="${s}" ${idx === 1 || (listaSemanas.length === 1 && idx === 0) ? 'checked' : ''}>
+                    <input type="checkbox" value="${s}" checked>
                     <span>${s}</span>
                 </label>
             `).join('');
 
             const updateSelection = () => {
-                const checkedBase = Array.from(optionsBaseContainer.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
-                const checkedTarget = Array.from(optionsTargetContainer.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+                const checkedWeeks = Array.from(optionsContainer.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
 
                 // Guarantee at least 1 checked
-                if (checkedBase.length === 0) {
-                    optionsBaseContainer.querySelector('input[type="checkbox"]').checked = true;
-                    checkedBase.push(listaSemanas[0]);
-                }
-                if (checkedTarget.length === 0) {
-                    const fallbackIdx = listaSemanas.length > 1 ? 1 : 0;
-                    optionsTargetContainer.querySelectorAll('input[type="checkbox"]')[fallbackIdx].checked = true;
-                    checkedTarget.push(listaSemanas[fallbackIdx]);
+                if (checkedWeeks.length === 0) {
+                    optionsContainer.querySelector('input[type="checkbox"]').checked = true;
+                    checkedWeeks.push(listaSemanas[0]);
                 }
 
-                GLOBAL_SELECTED_BASE_WEEKS = checkedBase;
-                GLOBAL_SELECTED_TARGET_WEEKS = checkedTarget;
+                GLOBAL_SELECTED_WEEKS = checkedWeeks;
 
-                // Update Button Labels
-                if (checkedBase.length === listaSemanas.length) {
-                    labelBase.innerText = `Todas (${checkedBase.length})`;
-                } else if (checkedBase.length === 1) {
-                    labelBase.innerText = checkedBase[0];
+                // Update Button Label
+                if (checkedWeeks.length === listaSemanas.length) {
+                    labelWeeks.innerText = `Todas as Semanas (${checkedWeeks.length})`;
+                } else if (checkedWeeks.length === 1) {
+                    labelWeeks.innerText = checkedWeeks[0];
                 } else {
-                    labelBase.innerText = `${checkedBase.length} Semanas`;
+                    labelWeeks.innerText = `${checkedWeeks.length} Semanas Selecionadas`;
                 }
 
-                if (checkedTarget.length === listaSemanas.length) {
-                    labelTarget.innerText = `Todas (${checkedTarget.length})`;
-                } else if (checkedTarget.length === 1) {
-                    labelTarget.innerText = checkedTarget[0];
-                } else {
-                    labelTarget.innerText = `${checkedTarget.length} Semanas`;
-                }
-
-                const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, checkedBase, checkedTarget);
-                renderComparativoDashboard(compRes);
+                const compMultiRes = processarComparativoMultiSemanas(GLOBAL_SEMANAS_MAP, checkedWeeks);
+                renderComparativoDashboard(compMultiRes);
             };
 
-            // Event Listeners for dropdown buttons
-            btnMsBase.onclick = (e) => {
+            // Event Listeners for dropdown button
+            btnMsWeeks.onclick = (e) => {
                 e.stopPropagation();
-                dropdownBase.classList.toggle('hidden');
-                dropdownTarget.classList.add('hidden');
+                dropdownWeeks.classList.toggle('hidden');
             };
 
-            btnMsTarget.onclick = (e) => {
-                e.stopPropagation();
-                dropdownTarget.classList.toggle('hidden');
-                dropdownBase.classList.add('hidden');
-            };
-
-            // Event Listeners for Checkbox changes
-            optionsBaseContainer.onchange = updateSelection;
-            optionsTargetContainer.onchange = updateSelection;
+            // Event Listener for Checkbox changes
+            optionsContainer.onchange = updateSelection;
 
             // Action Buttons
-            document.getElementById('btn-all-base').onclick = (e) => {
+            document.getElementById('btn-all-weeks').onclick = (e) => {
                 e.stopPropagation();
-                optionsBaseContainer.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+                optionsContainer.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
                 updateSelection();
             };
 
-            document.getElementById('btn-clear-base').onclick = (e) => {
+            document.getElementById('btn-clear-weeks').onclick = (e) => {
                 e.stopPropagation();
-                optionsBaseContainer.querySelectorAll('input[type="checkbox"]').forEach((c, idx) => c.checked = idx === 0);
+                optionsContainer.querySelectorAll('input[type="checkbox"]').forEach((c, idx) => c.checked = idx === 0);
                 updateSelection();
             };
 
-            document.getElementById('btn-all-target').onclick = (e) => {
-                e.stopPropagation();
-                optionsTargetContainer.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
-                updateSelection();
-            };
-
-            document.getElementById('btn-clear-target').onclick = (e) => {
-                e.stopPropagation();
-                optionsTargetContainer.querySelectorAll('input[type="checkbox"]').forEach((c, idx) => c.checked = idx === (listaSemanas.length > 1 ? 1 : 0));
-                updateSelection();
-            };
-
-            // Close dropdowns on outside click
+            // Close dropdown on outside click
             if (!window.msOutsideClickListening) {
                 window.msOutsideClickListening = true;
                 document.addEventListener('click', (e) => {
                     if (!e.target.closest('.multi-select-container')) {
-                        const dBase = document.getElementById('dropdown-ms-base');
-                        const dTarget = document.getElementById('dropdown-ms-target');
-                        if (dBase) dBase.classList.add('hidden');
-                        if (dTarget) dTarget.classList.add('hidden');
+                        const dWeeks = document.getElementById('dropdown-ms-weeks');
+                        if (dWeeks) dWeeks.classList.add('hidden');
                     }
                 });
             }

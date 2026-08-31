@@ -925,35 +925,18 @@
                 <button id="tab-comparison" class="view-tab">📈 Comparativo <span class="tab-badge">Novo</span></button>
             </div>
             <div id="comparison-selectors" class="comparison-selectors hidden">
-                <span style="font-weight: 700;">Base:</span>
+                <span style="font-weight: 700;">Semanas em Análise:</span>
                 <div class="multi-select-container">
-                    <button type="button" class="multi-select-btn" id="btn-ms-base">
-                        <span id="label-ms-base">Selecione...</span>
+                    <button type="button" class="multi-select-btn" id="btn-ms-weeks">
+                        <span id="label-ms-weeks">Selecione as semanas...</span>
                         <span class="arrow">▼</span>
                     </button>
-                    <div class="multi-select-dropdown hidden" id="dropdown-ms-base">
+                    <div class="multi-select-dropdown hidden" id="dropdown-ms-weeks">
                         <div class="multi-select-actions">
-                            <button type="button" class="btn-ms-action" id="btn-all-base">Selecionar Todas</button>
-                            <button type="button" class="btn-ms-action" id="btn-clear-base">Limpar</button>
+                            <button type="button" class="btn-ms-action" id="btn-all-weeks">Selecionar Todas</button>
+                            <button type="button" class="btn-ms-action" id="btn-clear-weeks">Limpar</button>
                         </div>
-                        <div class="multi-select-options" id="options-ms-base"></div>
-                    </div>
-                </div>
-
-                <span style="margin: 0 0.2rem; font-weight: 700; color: var(--accent);">vs</span>
-
-                <span style="font-weight: 700;">Comparado:</span>
-                <div class="multi-select-container">
-                    <button type="button" class="multi-select-btn" id="btn-ms-target">
-                        <span id="label-ms-target">Selecione...</span>
-                        <span class="arrow">▼</span>
-                    </button>
-                    <div class="multi-select-dropdown hidden" id="dropdown-ms-target">
-                        <div class="multi-select-actions">
-                            <button type="button" class="btn-ms-action" id="btn-all-target">Selecionar Todas</button>
-                            <button type="button" class="btn-ms-action" id="btn-clear-target">Limpar</button>
-                        </div>
-                        <div class="multi-select-options" id="options-ms-target"></div>
+                        <div class="multi-select-options" id="options-ms-weeks"></div>
                     </div>
                 </div>
             </div>
@@ -1039,104 +1022,101 @@
                 </div>
             </div>
 
-            <!-- TELA 2: COMPARATIVO SEMANAL E MENSAL (EQUIPARADO À VISÃO GERAL) -->
+            <!-- TELA 2: COMPARATIVO MULTI-SEMANAL E MENSAL -->
             <div id="comparison-view" class="hidden">
                 <div class="kpi-grid">
                     <div class="kpi-card">
-                        <h3>Cupons Emitidos (Δ%)</h3>
-                        <p id="comp-kpi-cupons">0 ➔ 0</p>
-                        <div id="comp-badge-cupons" class="delta-badge neutral">0%</div>
+                        <h3>Cupons Emitidos (Consolidado)</h3>
+                        <p id="comp-kpi-cupons">0</p>
+                        <div id="comp-badge-cupons" class="delta-badge neutral">0 Semanas</div>
                     </div>
                     <div class="kpi-card">
-                        <h3>Total Vendido Bruto (Δ%)</h3>
-                        <p id="comp-kpi-vendido">R$ 0 ➔ R$ 0</p>
-                        <div id="comp-badge-vendido" class="delta-badge neutral">0%</div>
+                        <h3>Total Vendido Bruto</h3>
+                        <p id="comp-kpi-vendido">R$ 0</p>
+                        <div id="comp-badge-vendido" class="delta-badge neutral">Total Período</div>
                     </div>
                     <div class="kpi-card">
-                        <h3>Total em Descontos (Δ%)</h3>
-                        <p id="comp-kpi-desconto">R$ 0 ➔ R$ 0</p>
-                        <div id="comp-badge-desconto" class="delta-badge neutral">0%</div>
+                        <h3>Total em Descontos</h3>
+                        <p id="comp-kpi-desconto">R$ 0</p>
+                        <div id="comp-badge-desconto" class="delta-badge neutral">Total Período</div>
                     </div>
                     <div class="kpi-card">
-                        <h3>Margem Bruta (Δ%)</h3>
-                        <p id="comp-kpi-margem">R$ 0 ➔ R$ 0</p>
-                        <div id="comp-badge-margem" class="delta-badge neutral">0%</div>
+                        <h3>Margem Bruta</h3>
+                        <p id="comp-kpi-margem">R$ 0</p>
+                        <div id="comp-badge-margem" class="delta-badge neutral">Total Período</div>
                     </div>
                     <div class="kpi-card">
-                        <h3>% Médio de Desconto (Δ%)</h3>
-                        <p id="comp-kpi-pct-desc">0% ➔ 0%</p>
-                        <div id="comp-badge-pct-desc" class="delta-badge neutral">0 pp</div>
+                        <h3>% Médio de Desconto</h3>
+                        <p id="comp-kpi-pct-desc">0%</p>
+                        <div id="comp-badge-pct-desc" class="delta-badge neutral">Média Ponderada</div>
+                    </div>
+                </div>
+
+                <!-- TABELA EVOLUTIVA POR SEMANA SELECIONADA -->
+                <div class="chart-card" style="margin-top: 1.5rem;">
+                    <div class="chart-header">📈 Evolução Semanal dos Indicadores</div>
+                    <div style="overflow-x: auto;">
+                        <table class="comp-table">
+                            <thead>
+                                <tr>
+                                    <th>Semana / Período</th>
+                                    <th>Cupons Emitidos</th>
+                                    <th>Total Vendido</th>
+                                    <th>Desconto (R$)</th>
+                                    <th>% Desconto</th>
+                                    <th>Margem Bruta</th>
+                                    <th>Evolução (vs Sem. Ant.)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-comp-evolucao"></tbody>
+                        </table>
                     </div>
                 </div>
 
                 <div class="charts-grid" style="margin-top: 1.5rem;">
                     <div class="chart-card">
-                        <div class="chart-header">📊 Cupons por Loja (Comparativo)</div>
+                        <div class="chart-header">📊 Cupons por Loja (Multi-Barras Semanal)</div>
                         <div class="canvas-wrapper"><canvas id="chartCompLojas"></canvas></div>
                     </div>
                     <div class="chart-card">
-                        <div class="chart-header">📊 Cupons por Vendedor (Comparativo)</div>
+                        <div class="chart-header">📊 Cupons por Vendedor (Multi-Barras Semanal)</div>
                         <div class="canvas-wrapper"><canvas id="chartCompVend"></canvas></div>
                     </div>
                     <div class="chart-card">
-                        <div class="chart-header">📊 Cupons por Linha de Medicamento (Comparativo)</div>
+                        <div class="chart-header">📊 Cupons por Linha de Medicamento (Multi-Barras Semanal)</div>
                         <div class="canvas-wrapper"><canvas id="chartCompLinhas"></canvas></div>
                     </div>
                     <div class="chart-card">
-                        <div class="chart-header">📊 Top Categorias (Comparativo)</div>
+                        <div class="chart-header">📊 Top Categorias (Multi-Barras Semanal)</div>
                         <div class="canvas-wrapper"><canvas id="chartCompCat"></canvas></div>
                     </div>
                 </div>
 
                 <div class="chart-card" style="margin-top: 1.5rem;">
-                    <div class="chart-header">📋 Tabela Comparativa de Linhas de Medicamento</div>
+                    <div class="chart-header">📋 Tabela Comparativa de Linhas de Medicamento por Semana</div>
                     <div style="overflow-x: auto;">
                         <table class="comp-table">
-                            <thead>
-                                <tr>
-                                    <th>Linha de Produto</th>
-                                    <th id="th-sem-base-linha">Período 1</th>
-                                    <th id="th-sem-target-linha">Período 2</th>
-                                    <th>Variação (Δ%)</th>
-                                    <th>Status de Desempenho</th>
-                                </tr>
-                            </thead>
+                            <thead id="thead-comp-linhas"></thead>
                             <tbody id="tbody-comp-linhas"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="chart-card" style="margin-top: 1.5rem;">
-                    <div class="chart-header">📋 Tabela Comparativa de Lojas</div>
+                    <div class="chart-header">📋 Tabela Comparativa de Lojas por Semana</div>
                     <div style="overflow-x: auto;">
                         <table class="comp-table">
-                            <thead>
-                                <tr>
-                                    <th>Loja / Unidade</th>
-                                    <th id="th-sem-base-loja">Período 1</th>
-                                    <th id="th-sem-target-loja">Período 2</th>
-                                    <th>Variação (Δ%)</th>
-                                    <th>Status de Desempenho</th>
-                                </tr>
-                            </thead>
+                            <thead id="thead-comp-lojas"></thead>
                             <tbody id="tbody-comp-lojas"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="chart-card" style="margin-top: 1.5rem;">
-                    <div class="chart-header">📋 Tabela Comparativa de Vendedores</div>
+                    <div class="chart-header">📋 Tabela Comparativa de Vendedores por Semana</div>
                     <div style="overflow-x: auto;">
                         <table class="comp-table">
-                            <thead>
-                                <tr>
-                                    <th>Vendedor</th>
-                                    <th id="th-sem-base-vend">Período 1</th>
-                                    <th id="th-sem-target-vend">Período 2</th>
-                                    <th>Variação (Δ%)</th>
-                                    <th>Status de Desempenho</th>
-                                </tr>
-                            </thead>
+                            <thead id="thead-comp-vendedores"></thead>
                             <tbody id="tbody-comp-vendedores"></tbody>
                         </table>
                     </div>

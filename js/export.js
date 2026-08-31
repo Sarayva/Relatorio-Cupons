@@ -285,53 +285,68 @@ async function exportarExcelProfissional() {
 
         // 6. ABA COMPARATIVO COMPLETO (LOJAS, VENDEDORES E LINHAS)
         const listaSemanasExp = Object.keys(GLOBAL_SEMANAS_MAP);
-        if (listaSemanasExp.length > 1) {
+        if (listaSemanasExp.length >= 1) {
             const wsComp = workbook.addWorksheet('Comparativo Completo', { views: [{ showGridLines: true }] });
-            const semA = (typeof GLOBAL_SELECTED_BASE_WEEKS !== 'undefined' && GLOBAL_SELECTED_BASE_WEEKS.length) ? GLOBAL_SELECTED_BASE_WEEKS : listaSemanasExp[0];
-            const semB = (typeof GLOBAL_SELECTED_TARGET_WEEKS !== 'undefined' && GLOBAL_SELECTED_TARGET_WEEKS.length) ? GLOBAL_SELECTED_TARGET_WEEKS : listaSemanasExp[listaSemanasExp.length - 1];
-            const compRes = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, semA, semB);
+            const selWeeks = (typeof GLOBAL_SELECTED_WEEKS !== 'undefined' && GLOBAL_SELECTED_WEEKS.length) ? GLOBAL_SELECTED_WEEKS : listaSemanasExp;
+            const compMultiRes = processarComparativoMultiSemanas(GLOBAL_SEMANAS_MAP, selWeeks);
 
-            if (compRes) {
-                const semALabel = compRes.semanaBase;
-                const semBLabel = compRes.semanaComparada;
+            if (compMultiRes) {
+                const sems = compMultiRes.semanasSelecionadas;
 
                 // TÍTULO DO COMPARATIVO
-                wsComp.mergeCells('A1:E1');
+                const colCount = sems.length + 2;
+                wsComp.mergeCells(1, 1, 1, colCount);
                 const tCompCell = wsComp.getCell('A1');
-                tCompCell.value = `COMPARATIVO ANÁLITICO: ${semALabel} vs ${semBLabel}`;
+                tCompCell.value = `RELATÓRIO COMPARATIVO SEMANAL MULTI-BARRAS (${sems.join(' | ')})`;
                 tCompCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
                 tCompCell.font = TITLE_FONT;
                 tCompCell.alignment = { vertical: 'middle', horizontal: 'center' };
                 wsComp.getRow(1).height = 36;
 
-                // SEÇÃO 1: COMPARATIVO POR LOJA
                 let rIdx = 3;
+
+                // SEÇÃO 0: TABELA EVOLUTIVA SEMANAL
+                const rHEvol = wsComp.getRow(rIdx);
+                rHEvol.getCell(1).value = '1. INDICADORES DE EVOLUÇÃO SEMANAL';
+                rHEvol.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
+                rIdx++;
+
+                const hEvol = wsComp.getRow(rIdx);
+                hEvol.values = ['Semana / Período', 'Cupons Emitidos', 'Total Vendido (R$)', 'Desconto (R$)', '% Desconto', 'Margem Bruta (R$)', 'Variação vs Sem. Ant.'];
+                formatHeaderRow(hEvol);
+                rIdx++;
+
+                compMultiRes.evolucaoSemanal.forEach(ev => {
+                    const row = wsComp.getRow(rIdx);
+                    row.values = [ev.semana, ev.cupons, ev.vendaTotal, ev.descontoTotal, ev.pctDesc / 100, ev.margemTotal, ev.deltaPrev ? ev.deltaPrev / 100 : 0];
+                    row.getCell(2).numFmt = '#,##0';
+                    row.getCell(3).numFmt = 'R$ #,##0.00';
+                    row.getCell(4).numFmt = 'R$ #,##0.00';
+                    row.getCell(5).numFmt = '0.0%';
+                    row.getCell(6).numFmt = 'R$ #,##0.00';
+                    row.getCell(7).numFmt = '+0.0%;-0.0%;0.0%';
+                    rIdx++;
+                });
+
+                rIdx += 2;
+
+                // SEÇÃO 1: COMPARATIVO POR LOJA
                 const rHLoja = wsComp.getRow(rIdx);
-                rHLoja.getCell(1).value = 'TABELA COMPARATIVA POR LOJA / UNIDADE';
+                rHLoja.getCell(1).value = '2. TABELA COMPARATIVA POR LOJA / UNIDADE';
                 rHLoja.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
                 rIdx++;
 
                 const hCompLojas = wsComp.getRow(rIdx);
-                hCompLojas.values = ['Loja / Unidade', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompLojas.values = ['Loja / Unidade', ...sems.map(s => `Cupons (${s})`), 'Total Cupons'];
                 formatHeaderRow(hCompLojas);
                 rIdx++;
 
-                compRes.lojas.forEach(l => {
-                    let statusBg = l.deltaNum > 0 ? 'FFFADBD8' : l.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
-                    let statusFg = l.deltaNum > 0 ? 'FFC0392B' : l.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
-
+                compMultiRes.lojas.forEach(l => {
                     const row = wsComp.getRow(rIdx);
-                    row.values = [l.loja, l.cA, l.cB, l.deltaNum / 100, l.statusLabel];
-                    row.getCell(2).numFmt = '#,##0';
-                    row.getCell(3).numFmt = '#,##0';
-                    row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
-
-                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-                    row.getCell(5).alignment = { horizontal: 'center' };
+                    row.values = [l.loja, ...sems.map(s => l.porSemana[s] || 0), l.total];
+                    for (let c = 2; c <= sems.length + 2; c++) {
+                        row.getCell(c).numFmt = '#,##0';
+                    }
                     rIdx++;
                 });
 
@@ -339,31 +354,21 @@ async function exportarExcelProfissional() {
 
                 // SEÇÃO 2: COMPARATIVO POR VENDEDOR
                 const rHVend = wsComp.getRow(rIdx);
-                rHVend.getCell(1).value = 'TABELA COMPARATIVA POR VENDEDOR';
+                rHVend.getCell(1).value = '3. TABELA COMPARATIVA POR VENDEDOR';
                 rHVend.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
                 rIdx++;
 
                 const hCompVend = wsComp.getRow(rIdx);
-                hCompVend.values = ['Vendedor', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompVend.values = ['Vendedor', ...sems.map(s => `Cupons (${s})`), 'Total Cupons'];
                 formatHeaderRow(hCompVend);
                 rIdx++;
 
-                compRes.vendedores.slice(0, 15).forEach(v => {
-                    let statusBg = v.deltaNum > 0 ? 'FFFADBD8' : v.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
-                    let statusFg = v.deltaNum > 0 ? 'FFC0392B' : v.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
-
+                compMultiRes.vendedores.slice(0, 20).forEach(v => {
                     const row = wsComp.getRow(rIdx);
-                    row.values = [v.vend, v.cA, v.cB, v.deltaNum / 100, v.statusLabel];
-                    row.getCell(2).numFmt = '#,##0';
-                    row.getCell(3).numFmt = '#,##0';
-                    row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
-
-                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-                    row.getCell(5).alignment = { horizontal: 'center' };
+                    row.values = [v.vend, ...sems.map(s => v.porSemana[s] || 0), v.total];
+                    for (let c = 2; c <= sems.length + 2; c++) {
+                        row.getCell(c).numFmt = '#,##0';
+                    }
                     rIdx++;
                 });
 
@@ -371,31 +376,21 @@ async function exportarExcelProfissional() {
 
                 // SEÇÃO 3: COMPARATIVO POR LINHA DE MEDICAMENTO
                 const rHLinha = wsComp.getRow(rIdx);
-                rHLinha.getCell(1).value = 'TABELA COMPARATIVA POR LINHA DE MEDICAMENTO';
+                rHLinha.getCell(1).value = '4. TABELA COMPARATIVA POR LINHA DE MEDICAMENTO';
                 rHLinha.getCell(1).font = { name: 'Segoe UI', size: 12, bold: true, color: { argb: 'FFC0392B' } };
                 rIdx++;
 
                 const hCompLinha = wsComp.getRow(rIdx);
-                hCompLinha.values = ['Linha de Medicamento', `Cupons (${semALabel})`, `Cupons (${semBLabel})`, 'Variação (Δ%)', 'Status de Desempenho'];
+                hCompLinha.values = ['Linha de Medicamento', ...sems.map(s => `Cupons (${s})`), 'Total Cupons'];
                 formatHeaderRow(hCompLinha);
                 rIdx++;
 
-                compRes.linhas.forEach(ln => {
-                    let statusBg = ln.deltaNum > 0 ? 'FFFADBD8' : ln.deltaNum < 0 ? 'FFD5F5E3' : 'FFFCE5CD';
-                    let statusFg = ln.deltaNum > 0 ? 'FFC0392B' : ln.deltaNum < 0 ? 'FF1E8449' : 'FFB9770E';
-
+                compMultiRes.linhas.forEach(ln => {
                     const row = wsComp.getRow(rIdx);
-                    row.values = [ln.linha, ln.cA, ln.cB, ln.deltaNum / 100, ln.statusLabel];
-                    row.getCell(2).numFmt = '#,##0';
-                    row.getCell(3).numFmt = '#,##0';
-                    row.getCell(4).numFmt = '+0.0%;-0.0%;0.0%';
-
-                    row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(4).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-
-                    row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: statusBg } };
-                    row.getCell(5).font = { name: 'Segoe UI', size: 10, bold: true, color: { argb: statusFg } };
-                    row.getCell(5).alignment = { horizontal: 'center' };
+                    row.values = [ln.linha, ...sems.map(s => ln.porSemana[s] || 0), ln.total];
+                    for (let c = 2; c <= sems.length + 2; c++) {
+                        row.getCell(c).numFmt = '#,##0';
+                    }
                     rIdx++;
                 });
 
