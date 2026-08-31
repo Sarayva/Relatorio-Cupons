@@ -266,6 +266,41 @@ function drawFinChart(ctxId, labels, dsInfo) {
     });
 }
 
+function parseDateValue(dataRaw) {
+    if (!dataRaw) return null;
+    if (dataRaw instanceof Date && !isNaN(dataRaw.getTime())) return dataRaw;
+    if (typeof dataRaw === 'number') {
+        if (typeof XLSX !== 'undefined' && XLSX.SSF && XLSX.SSF.parse_date_code) {
+            const parsed = XLSX.SSF.parse_date_code(dataRaw);
+            if (parsed) return new Date(parsed.y, parsed.m - 1, parsed.d);
+        }
+        const utcDays = Math.floor(dataRaw - 25569);
+        const utcValue = utcDays * 86400;
+        const dateInfo = new Date(utcValue * 1000);
+        return isNaN(dateInfo.getTime()) ? null : dateInfo;
+    }
+    const strDate = String(dataRaw).trim().split(' ')[0];
+    let parts = strDate.split('/');
+    if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        let year = parseInt(parts[2], 10);
+        if (year < 100) year += 2000;
+        const d = new Date(year, month, day);
+        if (!isNaN(d.getTime())) return d;
+    }
+    parts = strDate.split('-');
+    if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        if (!isNaN(d.getTime())) return d;
+    }
+    const d = new Date(strDate);
+    return isNaN(d.getTime()) ? null : d;
+}
+
 function calcularDashboard(records) {
     let gCupons = new Set();
     let gLojas = new Set();
@@ -285,6 +320,7 @@ function calcularDashboard(records) {
     let pDia = {};
     let datasDiaUnico = {};
     let financeiroLoja = {};
+    let datasColetadas = [];
 
     records.forEach(r => {
         let nr = getFieldValue(r, 'cupom');
@@ -304,15 +340,9 @@ function calcularDashboard(records) {
         let dia = null;
         let fData = null;
         if (dataRaw) {
-            let strDate = String(dataRaw).trim().split(' ')[0];
-            let parts = strDate.split('/');
-            let d;
-            if (parts.length === 3) d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-            else {
-                parts = strDate.split('-');
-                if (parts.length === 3) d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-            }
-            if (d && !isNaN(d.getTime())) {
+            let d = parseDateValue(dataRaw);
+            if (d) {
+                datasColetadas.push(d);
                 const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
                 dia = diasSemana[d.getDay()];
                 fData = d.toISOString().split('T')[0];
@@ -359,6 +389,24 @@ function calcularDashboard(records) {
         if (!isNaN(vDesc)) financeiroLoja[loja].desc += vDesc;
         if (!isNaN(vMargem)) financeiroLoja[loja].margem += vMargem;
     });
+
+    let periodoTexto = 'Não especificado';
+    if (datasColetadas.length > 0) {
+        const timestamps = datasColetadas.map(d => d.getTime());
+        const minDate = new Date(Math.min(...timestamps));
+        const maxDate = new Date(Math.max(...timestamps));
+
+        const fmtDate = d => {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        };
+
+        const minStr = fmtDate(minDate);
+        const maxStr = fmtDate(maxDate);
+        periodoTexto = (minStr === maxStr) ? minStr : `${minStr} a ${maxStr}`;
+    }
 
     document.getElementById('kpi-cupons').innerText = gCupons.size.toLocaleString('pt-BR');
     document.getElementById('kpi-lojas-vend').innerText = `${gLojas.size} / ${gVend.size}`;
@@ -421,14 +469,14 @@ function calcularDashboard(records) {
 
     gerarResumoExecutivo({
         totCupons, sumVendido, sumDesc, sumMargem, countPct, sumPctDesc,
-        arrLojas, arrVend, arrLinha, arrCats, diaData, gLojas, gVend
+        arrLojas, arrVend, arrLinha, arrCats, diaData, gLojas, gVend, periodoTexto
     });
 
     GLOBAL_EXPORT_DATA = { arrLojas, arrVend, arrCats, arrLinha, diaData, financeiroLoja };
 }
 
 function gerarResumoExecutivo(dados) {
-    const { totCupons, sumVendido, sumDesc, sumMargem, countPct, sumPctDesc, arrLojas, arrVend, arrLinha, arrCats, diaData, gLojas, gVend } = dados;
+    const { totCupons, sumVendido, sumDesc, sumMargem, countPct, sumPctDesc, arrLojas, arrVend, arrLinha, arrCats, diaData, gLojas, gVend, periodoTexto } = dados;
 
     const mediaLojas = totCupons / (gLojas.size || 1);
     const lojasAlerta = arrLojas.filter(l => l.q > mediaLojas * 1.3);
@@ -443,6 +491,9 @@ function gerarResumoExecutivo(dados) {
     diaData.forEach(d => { if (d.v > diaCritico.v) diaCritico = d; });
 
     const html = `
+        <div class="summary-period-bar">
+            <span>📅</span> <span><strong>Período Analisado:</strong> ${periodoTexto || 'Não especificado'}</span>
+        </div>
         <div class="summary-grid">
             <div class="summary-item">
                 <div class="summary-item-header">📊 Volume Geral</div>
@@ -494,6 +545,7 @@ function initCopySummary() {
         const container = document.getElementById('summary-content');
         if (!container) return;
 
+        const periodElem = container.querySelector('.summary-period-bar');
         const items = container.querySelectorAll('.summary-item');
         const execTitle = container.querySelector('.summary-exec-title');
         const execDesc = container.querySelector('.summary-exec-desc');
@@ -503,7 +555,11 @@ function initCopySummary() {
             return;
         }
 
-        let copyText = '📝 RESUMO EXECUTIVO GERENCIAL - FARMAPAULO\n\n';
+        let copyText = '📝 RESUMO EXECUTIVO GERENCIAL - FARMAPAULO\n';
+        if (periodElem) {
+            copyText += `${periodElem.innerText.trim()}\n`;
+        }
+        copyText += '\n';
 
         items.forEach(item => {
             const header = item.querySelector('.summary-item-header')?.innerText.trim() || '';
@@ -549,4 +605,5 @@ function initCopySummary() {
         }
     });
 }
+
 
