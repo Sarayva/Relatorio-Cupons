@@ -370,6 +370,18 @@ function processarComparativoMultiSemanas(semanasMap, selectedWeekKeys) {
     };
 }
 
+// Alias de compatibilidade retroativa caso chamado por scripts ou versoes antigas em cache
+function calcularComparativoSemanal(semanasMap, weekKeyBase, weekKeyTarget) {
+    const selectedKeys = [];
+    if (weekKeyBase) selectedKeys.push(weekKeyBase);
+    if (weekKeyTarget && weekKeyTarget !== weekKeyBase) selectedKeys.push(weekKeyTarget);
+    if (selectedKeys.length === 0 && semanasMap) {
+        selectedKeys.push(...Object.keys(semanasMap).slice(0, 2));
+    }
+    return processarComparativoMultiSemanas(semanasMap, selectedKeys);
+}
+window.calcularComparativoSemanal = calcularComparativoSemanal;
+
 function renderComparativoDashboard(compMultiRes) {
     if (!compMultiRes) return;
 
