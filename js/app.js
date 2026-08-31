@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabSwitching();
     initFileInputs();
     initDragAndDrop();
+    initCopySummary();
 });
 
 function initThemeToggle() {

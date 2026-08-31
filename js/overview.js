@@ -485,3 +485,68 @@ function gerarResumoExecutivo(dados) {
 
     document.getElementById('summary-content').innerHTML = html;
 }
+
+function initCopySummary() {
+    const btnCopy = document.getElementById('btn-copy-summary');
+    if (!btnCopy) return;
+
+    btnCopy.addEventListener('click', async () => {
+        const container = document.getElementById('summary-content');
+        if (!container) return;
+
+        const items = container.querySelectorAll('.summary-item');
+        const execTitle = container.querySelector('.summary-exec-title');
+        const execDesc = container.querySelector('.summary-exec-desc');
+
+        if (!items.length) {
+            alert('Nenhum resumo disponível para copiar. Importe uma planilha primeiro.');
+            return;
+        }
+
+        let copyText = '📝 RESUMO EXECUTIVO GERENCIAL - FARMAPAULO\n\n';
+
+        items.forEach(item => {
+            const header = item.querySelector('.summary-item-header')?.innerText.trim() || '';
+            const text = item.querySelector('.summary-item-text')?.innerText.trim() || '';
+            if (header || text) {
+                copyText += `• ${header}\n  ${text}\n\n`;
+            }
+        });
+
+        if (execTitle && execDesc) {
+            copyText += `${execTitle.innerText.trim()}\n${execDesc.innerText.trim()}\n`;
+        }
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(copyText.trim());
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = copyText.trim();
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                document.execCommand('copy');
+                textArea.remove();
+            }
+
+            const originalHTML = btnCopy.innerHTML;
+            btnCopy.innerHTML = '<span>✓</span> Copiado!';
+            btnCopy.style.borderColor = 'var(--color-green, #6ccb5f)';
+            btnCopy.style.color = 'var(--color-green, #6ccb5f)';
+
+            setTimeout(() => {
+                btnCopy.innerHTML = originalHTML;
+                btnCopy.style.borderColor = '';
+                btnCopy.style.color = '';
+            }, 2000);
+        } catch (err) {
+            console.error('Erro ao copiar resumo:', err);
+            alert('Não foi possível copiar o resumo automaticamente.');
+        }
+    });
+}
+
