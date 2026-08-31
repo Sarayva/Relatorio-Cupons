@@ -27,7 +27,7 @@ function formatPctBR(num) {
     return num.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
 }
 
-function getWeekInterval(dateStr) {
+function getWeekInterval(dateStr, minDateObj = null, maxDateObj = null) {
     if (!dateStr) return null;
     let str = (dateStr + "").trim().split(" ")[0];
     let parts = str.split('/');
@@ -49,8 +49,21 @@ function getWeekInterval(dateStr) {
     let sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
 
+    let startDt = monday;
+    if (minDateObj && monday < minDateObj) {
+        startDt = minDateObj;
+    }
+
+    let endDt = sunday;
+    if (maxDateObj && sunday > maxDateObj) {
+        endDt = maxDateObj;
+    }
+
     const fmt = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0');
-    return `${fmt(monday)} a ${fmt(sunday)}`;
+    if (startDt.getTime() === endDt.getTime()) {
+        return `${fmt(startDt)}`;
+    }
+    return `${fmt(startDt)} a ${fmt(endDt)}`;
 }
 
 function getWeekStartDate(intervaloStr) {
@@ -66,11 +79,39 @@ function getWeekStartDate(intervaloStr) {
 }
 
 function agruparPorSemanas(records) {
+    let allDates = [];
+    records.forEach(r => {
+        let dataRaw = getFieldValue(r, 'data');
+        if (!dataRaw) return;
+        let str = (dataRaw + "").trim().split(" ")[0];
+        let parts = str.split('/');
+        let d;
+        if (parts.length === 3) {
+            d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        } else {
+            parts = str.split('-');
+            if (parts.length === 3) {
+                d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+        }
+        if (d && !isNaN(d.getTime())) {
+            allDates.push(d);
+        }
+    });
+
+    let minDateObj = null;
+    let maxDateObj = null;
+    if (allDates.length > 0) {
+        allDates.sort((a, b) => a - b);
+        minDateObj = allDates[0];
+        maxDateObj = allDates[allDates.length - 1];
+    }
+
     const semanasMap = {};
 
     records.forEach(r => {
         let dataRaw = getFieldValue(r, 'data');
-        let intervalo = getWeekInterval(dataRaw);
+        let intervalo = getWeekInterval(dataRaw, minDateObj, maxDateObj);
         if (!intervalo) return;
 
         if (!semanasMap[intervalo]) {
