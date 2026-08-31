@@ -226,6 +226,20 @@ function parseExcelRecords(sheetData) {
 
     rawRows.forEach(row => {
         if (!row || row.length === 0) return;
+
+        const rowStr = JSON.stringify(row).toUpperCase();
+        if (
+            rowStr.includes("TOTAIS") || 
+            rowStr.includes("TOTAL") || 
+            rowStr.includes("USUÁRIO:") || 
+            rowStr.includes("USUARIO:") || 
+            rowStr.includes("PDV_RESUMO_FILIAL") ||
+            rowStr.includes("ÁRVORE MERCADOLÓGICA") ||
+            rowStr.includes("ARVORE MERCADOLOGICA")
+        ) {
+            return;
+        }
+
         let obj = {};
         let hasValue = false;
 
@@ -239,7 +253,19 @@ function parseExcelRecords(sheetData) {
                 hasValue = true;
             } else {
                 let hUpper = h.toUpperCase();
-                if (hUpper.includes('FILIAL') || hUpper.includes('LOJA') || hUpper.includes('DATA') || hUpper.includes('CUPOM') || hUpper.includes('VENDEDOR')) {
+                if (
+                    hUpper.includes('FILIAL') || 
+                    hUpper.includes('LOJA') || 
+                    hUpper.includes('DATA') || 
+                    hUpper.includes('CUPOM') || 
+                    hUpper.includes('VENDEDOR') ||
+                    hUpper.includes('CATEGOR') ||
+                    hUpper.includes('GRUPO') ||
+                    hUpper.includes('SECAO') ||
+                    hUpper.includes('SECÂO') ||
+                    hUpper.includes('DEPARTAM') ||
+                    hUpper.includes('TIPO')
+                ) {
                     obj[h] = lastSeen[h];
                 } else {
                     obj[h] = val;
