@@ -189,8 +189,11 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
         borderRadius: 4
     };
 
-    const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
-    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+    const isDark = !document.body.classList.contains('light-theme');
+    const textColor = isDark ? '#ffffff' : '#111827';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.12)';
+
+    Chart.defaults.color = textColor;
 
     const maxVal = Math.max(...data, 0);
     const paddedMax = maxVal > 0 ? maxVal * 1.15 : undefined;
@@ -211,7 +214,7 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
             plugins: {
                 legend: { display: false },
                 datalabels: {
-                    color: isDarkTheme ? '#ffffff' : '#1a1a1a',
+                    color: isDark ? '#ffffff' : '#111827',
                     anchor: 'end',
                     align: isHorizontal ? 'end' : 'bottom',
                     offset: 4,
@@ -223,12 +226,12 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
                 x: {
                     max: isHorizontal ? paddedMax : undefined,
                     grid: { color: isHorizontal ? gridColor : 'transparent' },
-                    ticks: { color: textColor }
+                    ticks: { color: textColor, font: { weight: '600' } }
                 },
                 y: {
                     max: !isHorizontal ? paddedMax : undefined,
                     grid: { color: isHorizontal ? 'transparent' : gridColor },
-                    ticks: { color: textColor }
+                    ticks: { color: textColor, font: { weight: '600' } }
                 }
             }
         }
@@ -238,8 +241,9 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
 function drawFinChart(ctxId, labels, dsInfo) {
     if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
 
-    const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
-    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+    const isDark = !document.body.classList.contains('light-theme');
+    const textColor = isDark ? '#ffffff' : '#111827';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.12)';
 
     chartsObj[ctxId] = new Chart(document.getElementById(ctxId), {
         type: 'bar',
@@ -251,12 +255,12 @@ function drawFinChart(ctxId, labels, dsInfo) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, color: textColor } },
+                legend: { position: 'top', labels: { boxWidth: 12, color: textColor, font: { weight: '600' } } },
                 datalabels: { display: false }
             },
             scales: {
-                x: { grid: { display: false }, ticks: { color: textColor } },
-                y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => `R$${v / 1000}k` } }
+                x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } },
+                y: { grid: { color: gridColor }, ticks: { color: textColor, font: { weight: '600' }, callback: v => `R$${v / 1000}k` } }
             }
         }
     });

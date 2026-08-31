@@ -26,10 +26,10 @@ function initThemeToggle() {
 
     toggleButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            isDarkTheme = !isDarkTheme;
+            document.body.classList.toggle('light-theme');
+            isDarkTheme = !document.body.classList.contains('light-theme');
 
             if (isDarkTheme) {
-                document.body.classList.remove('light-theme');
                 if (heroLogo) heroLogo.src = 'imagens/para fundo claro.png';
                 if (dashLogo) dashLogo.src = 'imagens/para fundo claro.png';
                 toggleButtons.forEach(b => {
@@ -37,7 +37,6 @@ function initThemeToggle() {
                     b.querySelector('.theme-btn-label').innerText = 'Modo Claro';
                 });
             } else {
-                document.body.classList.add('light-theme');
                 if (heroLogo) heroLogo.src = 'imagens/para fundo branco.png';
                 if (dashLogo) dashLogo.src = 'imagens/para fundo branco.png';
                 toggleButtons.forEach(b => {
@@ -46,16 +45,14 @@ function initThemeToggle() {
                 });
             }
 
+            Chart.defaults.color = isDarkTheme ? '#ffffff' : '#111827';
+
             if (GLOBAL_RECORDS.length > 0) {
                 calcularDashboard(GLOBAL_RECORDS);
             }
-            if (GLOBAL_SEMANAS_MAP && Object.keys(GLOBAL_SEMANAS_MAP).length > 0) {
-                const selectBase = document.getElementById('select-week-base');
-                const selectTarget = document.getElementById('select-week-target');
-                if (selectBase && selectTarget && selectBase.value && selectTarget.value) {
-                    const updatedComp = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
-                    renderComparativoDashboard(updatedComp);
-                }
+            if (typeof GLOBAL_SELECTED_WEEKS !== 'undefined' && GLOBAL_SELECTED_WEEKS.length > 0 && typeof GLOBAL_SEMANAS_MAP !== 'undefined') {
+                const compMultiRes = processarComparativoMultiSemanas(GLOBAL_SEMANAS_MAP, GLOBAL_SELECTED_WEEKS);
+                renderComparativoDashboard(compMultiRes);
             }
         });
     });

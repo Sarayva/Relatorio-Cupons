@@ -536,8 +536,11 @@ function drawMultiBarChart(ctxId, labels, selectedWeekKeys, datasetValuesMap) {
 
     if (chartsObj[ctxId]) chartsObj[ctxId].destroy();
 
-    const textColor = isDarkTheme ? '#ffffff' : '#1a1a1a';
-    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.07)' : '#e5e5e5';
+    const isDark = !document.body.classList.contains('light-theme');
+    const textColor = isDark ? '#ffffff' : '#111827';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.12)';
+
+    Chart.defaults.color = textColor;
 
     const datasets = selectedWeekKeys.map((semKey, idx) => ({
         label: semKey,
@@ -556,12 +559,30 @@ function drawMultiBarChart(ctxId, labels, selectedWeekKeys, datasetValuesMap) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top', labels: { color: textColor } },
+                legend: { 
+                    position: 'top', 
+                    labels: { 
+                        color: textColor,
+                        font: { weight: '600', size: 11 }
+                    } 
+                },
                 datalabels: { display: false }
             },
             scales: {
-                x: { grid: { display: false }, ticks: { color: textColor } },
-                y: { grid: { color: gridColor }, ticks: { color: textColor } }
+                x: { 
+                    grid: { display: false }, 
+                    ticks: { 
+                        color: textColor,
+                        font: { weight: '600', size: 11 }
+                    } 
+                },
+                y: { 
+                    grid: { color: gridColor }, 
+                    ticks: { 
+                        color: textColor,
+                        font: { weight: '600', size: 11 }
+                    } 
+                }
             }
         }
     });
