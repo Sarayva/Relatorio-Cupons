@@ -49,6 +49,14 @@ function initThemeToggle() {
             if (GLOBAL_RECORDS.length > 0) {
                 calcularDashboard(GLOBAL_RECORDS);
             }
+            if (GLOBAL_SEMANAS_MAP && Object.keys(GLOBAL_SEMANAS_MAP).length > 0) {
+                const selectBase = document.getElementById('select-week-base');
+                const selectTarget = document.getElementById('select-week-target');
+                if (selectBase && selectTarget && selectBase.value && selectTarget.value) {
+                    const updatedComp = calcularComparativoSemanal(GLOBAL_SEMANAS_MAP, selectBase.value, selectTarget.value);
+                    renderComparativoDashboard(updatedComp);
+                }
+            }
         });
     });
 }

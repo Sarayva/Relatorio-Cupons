@@ -211,7 +211,7 @@ function drawBarChart(ctxId, labels, data, colors, isHorizontal = true, labelOpt
             plugins: {
                 legend: { display: false },
                 datalabels: {
-                    color: isHorizontal ? (isDarkTheme ? '#ffffff' : '#1a1a1a') : '#fff',
+                    color: isDarkTheme ? '#ffffff' : '#1a1a1a',
                     anchor: 'end',
                     align: isHorizontal ? 'end' : 'bottom',
                     offset: 4,
