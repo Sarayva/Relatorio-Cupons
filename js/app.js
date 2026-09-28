@@ -12,6 +12,7 @@ Chart.register(ChartDataLabels);
 Chart.defaults.font.family = "'Inter', sans-serif";
 
 document.addEventListener('DOMContentLoaded', () => {
+    renderAppVersion();
     initThemeToggle();
     initBrandHomeNav();
     initTabSwitching();

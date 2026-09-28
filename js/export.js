@@ -421,6 +421,49 @@ async function exportarExcelProfissional() {
             }
         };
 
+        // Renderiza o gráfico num canvas fora da tela com tamanho fixo: o canvas
+        // original fica 0x0 quando a aba Visão Geral está oculta (display: none)
+        const CHART_EXPORT_W = 590;
+        const CHART_EXPORT_H = 320;
+        const renderChartForExport = (chartId) => {
+            const liveChart = chartsObj[chartId];
+            if (!liveChart) return null;
+
+            const holder = document.createElement('div');
+            holder.style.cssText = `position:fixed;left:-10000px;top:0;width:${CHART_EXPORT_W}px;height:${CHART_EXPORT_H}px;`;
+            const canvas = document.createElement('canvas');
+            canvas.width = CHART_EXPORT_W;
+            canvas.height = CHART_EXPORT_H;
+            holder.appendChild(canvas);
+            document.body.appendChild(holder);
+
+            let tmpChart = null;
+            try {
+                const cfg = liveChart.config;
+                tmpChart = new Chart(canvas, {
+                    type: cfg.type,
+                    data: {
+                        labels: [...cfg.data.labels],
+                        datasets: cfg.data.datasets.map(ds => ({ ...ds, data: [...ds.data] }))
+                    },
+                    options: {
+                        ...cfg.options,
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        devicePixelRatio: 2
+                    }
+                });
+                return getExportableChartImage(tmpChart.canvas);
+            } catch (e) {
+                console.warn('Não foi possível renderizar o gráfico para exportação:', chartId, e);
+                return null;
+            } finally {
+                if (tmpChart) tmpChart.destroy();
+                holder.remove();
+            }
+        };
+
         const chartPairs = [
             [
                 { id: 'chartLojas', title: '1. Ranking de Cupons por Loja' },
@@ -447,16 +490,13 @@ async function exportarExcelProfissional() {
                 cellL.value = leftChart.title;
                 cellL.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
 
-                const canvasL = document.getElementById(leftChart.id);
-                if (canvasL) {
-                    const imgDataL = getExportableChartImage(canvasL);
-                    if (imgDataL) {
-                        const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
-                        wsGraficos.addImage(imageIdL, {
-                            tl: { col: 0, row: startRow },
-                            ext: { width: 590, height: 320 }
-                        });
-                    }
+                const imgDataL = renderChartForExport(leftChart.id);
+                if (imgDataL) {
+                    const imageIdL = workbook.addImage({ base64: imgDataL, extension: 'png' });
+                    wsGraficos.addImage(imageIdL, {
+                        tl: { col: 0, row: startRow },
+                        ext: { width: CHART_EXPORT_W, height: CHART_EXPORT_H }
+                    });
                 }
             }
 
@@ -465,16 +505,13 @@ async function exportarExcelProfissional() {
                 cellR.value = rightChart.title;
                 cellR.font = { name: 'Segoe UI', size: 11, bold: true, color: { argb: 'FF000000' } };
 
-                const canvasR = document.getElementById(rightChart.id);
-                if (canvasR) {
-                    const imgDataR = getExportableChartImage(canvasR);
-                    if (imgDataR) {
-                        const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
-                        wsGraficos.addImage(imageIdR, {
-                            tl: { col: 14, row: startRow },
-                            ext: { width: 590, height: 320 }
-                        });
-                    }
+                const imgDataR = renderChartForExport(rightChart.id);
+                if (imgDataR) {
+                    const imageIdR = workbook.addImage({ base64: imgDataR, extension: 'png' });
+                    wsGraficos.addImage(imageIdR, {
+                        tl: { col: 14, row: startRow },
+                        ext: { width: CHART_EXPORT_W, height: CHART_EXPORT_H }
+                    });
                 }
             }
 
