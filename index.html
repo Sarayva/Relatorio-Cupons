@@ -286,6 +286,17 @@
             color: var(--text-muted);
         }
 
+        .hero-version {
+            position: absolute;
+            bottom: 1.25rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
         /* --- HEADER PRINCIPAL DO DASHBOARD --- */
         header {
             display: flex;
@@ -920,6 +931,8 @@
 
             <p class="hero-drop-hint">Ou arraste e solte a(s) planilha(s) aqui</p>
         </div>
+
+        <p class="hero-version" data-app-version></p>
     </div>
 
     <!-- CONTAINER DO DASHBOARD -->
@@ -930,7 +943,7 @@
                 <img id="dash-logo" src="imagens/para fundo claro.png" alt="FarmaPaulo Logo" class="dash-logo">
                 <div class="header-titles">
                     <h1>Painel de Cupons de Desconto</h1>
-                    <p>Relatório Analítico FarmaPaulo</p>
+                    <p>Relatório Analítico FarmaPaulo · <span data-app-version></span></p>
                 </div>
             </div>
 
@@ -1167,6 +1180,7 @@
     </div>
 
     <!-- MÓDULOS JAVASCRIPT SEPARADOS POR TELA -->
+    <script src="js/version.js"></script>
     <script src="js/overview.js"></script>
     <script src="js/comparison.js"></script>
     <script src="js/export.js"></script>
