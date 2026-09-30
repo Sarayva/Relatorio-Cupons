@@ -446,16 +446,27 @@ async function processDualFiles(fileA, fileB) {
         // Processar Comparativo Mensal Mês A vs Mês B
         const dualRes = processarDoisMeses(recordsA, recordsB, nameA, nameB);
         GLOBAL_SEMANAS_MAP = dualRes.mesesMap;
+        GLOBAL_SELECTED_WEEKS = dualRes.chaves;
 
         const viewModeBar = document.getElementById('view-mode-bar');
-        const selectBase = document.getElementById('select-week-base');
-        const selectTarget = document.getElementById('select-week-target');
-
         viewModeBar.classList.remove('hidden');
-        selectBase.innerHTML = `<option value="${nameA}">${nameA}</option>`;
-        selectTarget.innerHTML = `<option value="${nameB}">${nameB}</option>`;
-        selectBase.value = nameA;
-        selectTarget.value = nameB;
+
+        // No modo mensal os 2 meses ficam fixos no seletor (sem alternancia)
+        const optionsContainer = document.getElementById('options-ms-weeks');
+        optionsContainer.innerHTML = dualRes.chaves.map((m) => `
+            <label class="ms-option-label">
+                <input type="checkbox" value="${m}" checked disabled>
+                <span>${m}</span>
+            </label>
+        `).join('');
+        optionsContainer.onchange = null;
+        document.getElementById('label-ms-weeks').innerText = dualRes.chaves.join(' vs ');
+        document.getElementById('btn-ms-weeks').onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('dropdown-ms-weeks').classList.toggle('hidden');
+        };
+        document.getElementById('btn-all-weeks').onclick = (e) => e.stopPropagation();
+        document.getElementById('btn-clear-weeks').onclick = (e) => e.stopPropagation();
 
         renderComparativoDashboard(dualRes.resultado);
 
