@@ -370,6 +370,84 @@ function processarComparativoMultiSemanas(semanasMap, selectedWeekKeys) {
     };
 }
 
+// Agrega cada planilha mensal como um "periodo" no mesmo formato de agruparPorSemanas,
+// para reaproveitar processarComparativoMultiSemanas no comparativo Mes A vs Mes B
+function processarDoisMeses(recordsA, recordsB, labelMesA = "Mês Base", labelMesB = "Mês Alvo") {
+    if (labelMesA === labelMesB) {
+        labelMesA = `${labelMesA} (1)`;
+        labelMesB = `${labelMesB} (2)`;
+    }
+
+    const novoPeriodo = (label) => ({
+        intervalo: label,
+        cupons: new Set(),
+        lojas: {},
+        vendedores: {},
+        linhas: {},
+        categorias: {},
+        vendaTotal: 0,
+        descontoTotal: 0,
+        margemTotal: 0,
+        sumPctDesc: 0,
+        countPct: 0
+    });
+
+    const processarMes = (recs, targetMap) => {
+        recs.forEach(r => {
+            let nr = getFieldValue(r, 'cupom');
+            if (nr) targetMap.cupons.add(nr);
+
+            let codF = parseInt(getFieldValue(r, 'loja'));
+            let loja = STORE_MAP[codF] ? STORE_MAP[codF] : `Loja ${codF || r.CodFilial || 'N/A'}`;
+            let vend = getFieldValue(r, 'vendedor');
+            let cat = getFieldValue(r, 'categoria');
+            let linha = classificaLinha(cat);
+
+            if (!targetMap.lojas[loja]) targetMap.lojas[loja] = new Set();
+            if (nr) targetMap.lojas[loja].add(nr);
+
+            if (!targetMap.vendedores[vend]) targetMap.vendedores[vend] = new Set();
+            if (nr) targetMap.vendedores[vend].add(nr);
+
+            if (!targetMap.linhas[linha]) targetMap.linhas[linha] = new Set();
+            if (nr) targetMap.linhas[linha].add(nr);
+
+            if (!targetMap.categorias[cat]) targetMap.categorias[cat] = new Set();
+            if (nr) targetMap.categorias[cat].add(nr);
+
+            let vVenda = parseStrToNum(getFieldValue(r, 'venda'));
+            let vDesc = parseStrToNum(getFieldValue(r, 'desconto'));
+            let vMargem = parseStrToNum(getFieldValue(r, 'margem'));
+            let vPct = parseStrToNum(getFieldValue(r, 'pct'));
+
+            if (!isNaN(vVenda)) targetMap.vendaTotal += vVenda;
+            if (!isNaN(vDesc)) targetMap.descontoTotal += vDesc;
+            if (!isNaN(vMargem)) targetMap.margemTotal += vMargem;
+
+            if (vPct > 0 || getFieldValue(r, 'pct') != undefined) {
+                targetMap.sumPctDesc += vPct;
+                targetMap.countPct++;
+            }
+        });
+    };
+
+    const mapA = novoPeriodo(labelMesA);
+    const mapB = novoPeriodo(labelMesB);
+    processarMes(recordsA, mapA);
+    processarMes(recordsB, mapB);
+
+    const mesesMap = {
+        [labelMesA]: mapA,
+        [labelMesB]: mapB
+    };
+
+    return {
+        mesesMap: mesesMap,
+        chaves: [labelMesA, labelMesB],
+        resultado: processarComparativoMultiSemanas(mesesMap, [labelMesA, labelMesB])
+    };
+}
+
 // Alias de compatibilidade retroativa caso chamado por scripts ou versoes antigas em cache
 function calcularComparativoSemanal(semanasMap, weekKeyBase, weekKeyTarget) {
     const selectedKeys = [];
